@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAPOW Labs — the adaptive racing display</title>
+<meta name="description" content="WAPOW is an open-source dash that senses how you're driving and reprioritizes the display. Built in public by a former Formula Drift crew chief.">
+<style>
+  /* Palette lifted from wapow_dash.py — the dash IS the brand */
+  :root {
+    --bg:     #0b0e13;
+    --panel:  #131926;
+    --teal:   #37e0c0;
+    --dim:    #6b7688;
+    --text:   #eef2f8;
+    --amber:  #ffb648;
+    --red:    #ff5462;
+    --blue:   #4aa8ff;
+    --parked: #8b93a7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+  .mono { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- hero ---------- */
+  header {
+    padding: 96px 0 72px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(55,224,192,.07), transparent);
+  }
+  .wordmark { width: min(420px, 80vw); height: auto; display: block; margin: 0 auto; }
+  .labs {
+    font-size: 14px; letter-spacing: .55em; text-indent: .55em;
+    color: var(--teal); text-transform: uppercase; margin-top: 18px;
+  }
+  h1.tagline {
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 600; margin-top: 40px;
+  }
+  .sub {
+    color: var(--dim); max-width: 560px; margin: 16px auto 0;
+    font-size: 17px;
+  }
+  .cta-row { margin-top: 40px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 28px; border-radius: 6px;
+    text-decoration: none; font-weight: 600; font-size: 15px;
+    letter-spacing: .02em;
+  }
+  .btn-primary { background: var(--teal); color: var(--bg); }
+  .btn-primary:hover { filter: brightness(1.12); }
+  .btn-ghost { border: 1px solid var(--dim); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* ---------- mode strip ---------- */
+  .modes {
+    display: flex; justify-content: center; gap: 0;
+    border-top: 1px solid #1c2436; border-bottom: 1px solid #1c2436;
+    background: var(--panel);
+  }
+  .mode {
+    flex: 1; max-width: 240px; padding: 18px 8px; text-align: center;
+    font-size: 13px; letter-spacing: .25em; text-indent: .25em;
+    border-left: 1px solid #1c2436;
+  }
+  .mode:first-child { border-left: none; }
+  .mode b { display: block; font-family: "Segoe UI", system-ui, sans-serif; font-size: 12px; color: var(--dim); letter-spacing: normal; font-weight: 400; margin-top: 4px; text-transform: none; text-indent: 0; }
+  .m-parked  { color: var(--parked); }
+  .m-cruise  { color: var(--blue); }
+  .m-spirit  { color: var(--amber); }
+  .m-racing  { color: var(--red); }
+
+  /* ---------- sections ---------- */
+  section { padding: 72px 0; }
+  h2 {
+    font-size: 13px; letter-spacing: .4em; text-indent: .4em;
+    text-transform: uppercase; color: var(--teal);
+    text-align: center; margin-bottom: 40px; font-weight: 600;
+  }
+  .lede { max-width: 640px; margin: 0 auto; font-size: 18px; text-align: center; }
+  .lede + .lede { margin-top: 18px; color: var(--dim); font-size: 16px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 8px; }
+  .card {
+    background: var(--panel); border: 1px solid #1c2436; border-radius: 8px;
+    padding: 26px 24px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 10px; color: var(--text); }
+  .card p { color: var(--dim); font-size: 15px; }
+  .card .k { color: var(--teal); }
+
+  /* ---------- open source ---------- */
+  .os { background: var(--panel); border-top: 1px solid #1c2436; border-bottom: 1px solid #1c2436; }
+  .os .lede a { color: var(--teal); text-decoration: none; }
+  .os .lede a:hover { text-decoration: underline; }
+
+  /* ---------- footer ---------- */
+  footer { padding: 56px 0 72px; text-align: center; color: var(--dim); font-size: 14px; }
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .foot-links { display: flex; gap: 28px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Tile wordmark — corner-sweep gauge arc -->
+  <svg class="wordmark" style="width:min(560px,92vw)" viewBox="230 40 500 195" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WAPOW — adaptive racing display">
+    <path d="M 250 218 L 250 92 Q 250 64 278 64 L 700 64" fill="none" stroke="#232d3f" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 250 176 L 250 92 Q 250 64 278 64 L 356 64" fill="none" stroke="#37e0c0" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 250 118 L 250 92 Q 250 64 278 64 L 310 64" fill="none" stroke="#eef2f8" stroke-width="13" stroke-linecap="round" opacity=".9"/>
+    <circle cx="470" cy="64" r="6.5" fill="#eef2f8"/>
+    <text x="286" y="185" font-family="Bahnschrift, 'Arial Narrow', sans-serif" font-weight="700"
+          font-size="118" letter-spacing="1" fill="#eef2f8">WAPOW</text>
+    <text x="288" y="222" font-family="Consolas, monospace" font-size="15" letter-spacing="7" fill="#6b7688">ADAPTIVE RACING DISPLAY</text>
+  </svg>
+  <div class="labs mono">Labs</div>
+
+  <h1 class="tagline">The dash that knows how you're driving.</h1>
+  <p class="sub">Traditional dashes treat every gauge the same. Your attention doesn't.
+     WAPOW senses driving context — G-forces, RPM, speed — and reprioritizes the
+     display in real time.</p>
+
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://www.youtube.com/@wapowlabs">Follow the build</a>
+    <a class="btn btn-ghost" href="mailto:hello@wapowlabs.com">Get in touch</a>
+  </div>
+</header>
+
+<div class="modes mono">
+  <div class="mode m-parked">PARKED<b>everything, calmly</b></div>
+  <div class="mode m-cruise">CRUISING<b>the essentials</b></div>
+  <div class="mode m-spirit">SPIRITED<b>performance up front</b></div>
+  <div class="mode m-racing">RACING<b>only what matters</b></div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>How it thinks</h2>
+    <div class="cards">
+      <div class="card">
+        <h3><span class="k">Motion means meaning.</span></h3>
+        <p>The layout never moves unless the driver actually needs to look.
+           Mode upgrades are instant; downgrades wait for six seconds of
+           sustained calm. No dancing gauges.</p>
+      </div>
+      <div class="card">
+        <h3><span class="k">Deviation, not raw values.</span></h3>
+        <p>Oil pressure tracks RPM. Fuel pressure tracks boost. WAPOW shows
+           how far you are from <em>normal for right now</em> — steady when
+           healthy, loud when it isn't.</p>
+      </div>
+      <div class="card">
+        <h3><span class="k">Sentinel gauges.</span></h3>
+        <p>Oil pressure, fuel pressure, AFR live in a small fixed home row and
+           promote themselves to the main view only when something's wrong.
+           Alerts triage by severity, automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="os">
+  <div class="wrap">
+    <h2>Open source, built in public</h2>
+    <p class="lede">WAPOW is GPL v3 — the code is free, forever. We make our money
+       selling assembled, tested units so you don't have to solder anything.</p>
+    <p class="lede">Built by a former Formula Drift crew chief, documented on camera
+       from the first breadboard onward. Test car: a 2000 Impreza 2.5RS with an
+       STI heart.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://www.youtube.com/@wapowlabs">YouTube</a>
+    <a href="https://www.instagram.com/wapowlabs">Instagram</a>
+    <a href="mailto:hello@wapowlabs.com">hello@wapowlabs.com</a>
+  </div>
+  © 2026 WAPOW Labs · WAPOW — Windowed Adaptive Performance Optimization Widget
+</footer>
+
+</body>
+</html>
