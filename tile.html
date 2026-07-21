@@ -209,11 +209,12 @@
 <section id="demo-section">
   <div class="wrap">
     <h2>Watch it think</h2>
-    <p class="h2sub">This is a live simulation of the real logic — <strong>not a video</strong>.
-       One scripted drive, on loop: watch the layout escalate the moment the driving
-       gets serious, then watch an oil-pressure drop hijack the whole screen.</p>
+    <p class="h2sub">This is a live miniature of the real dash — <strong>same layouts, same
+       palette, same rules</strong>, drawn from actual WAPOW screenshots. One scripted
+       drive on loop: watch it wake up, escalate, take three alerts at once, and calm
+       back down.</p>
     <div class="demo-shell">
-      <canvas id="demo" width="960" height="430" aria-label="Animated demo of the WAPOW adaptive dash logic"></canvas>
+      <canvas id="demo" width="1024" height="600" aria-label="Animated demo of the WAPOW adaptive dash"></canvas>
     </div>
     <p class="demo-caption" id="demo-cap"></p>
   </div>
@@ -293,89 +294,109 @@
   const mark = document.getElementById("bootmark");
   if (mark && !reduced) {
     const rects = Array.from(mark.querySelectorAll("rect"));
-    // group rects into the five letters by x position
     const letterOf = x => x < 95 ? 0 : x < 175 ? 1 : x < 255 ? 2 : x < 335 ? 3 : 4;
     rects.forEach(r => r.style.opacity = "0");
     const letters = [[], [], [], [], []];
     rects.forEach(r => letters[letterOf(+r.getAttribute("x"))].push(r));
     letters.forEach((group, i) => {
-      const t0 = 250 + i * 200;                  // letters land one by one
-      setTimeout(() => {                          // glitch flicker, then solid
+      setTimeout(() => {
         let flicks = 0;
         const iv = setInterval(() => {
           group.forEach(r => r.style.opacity = (Math.random() > .4 ? "1" : "0"));
-          if (++flicks >= 4) {
-            clearInterval(iv);
-            group.forEach(r => r.style.opacity = "1");
-          }
+          if (++flicks >= 4) { clearInterval(iv); group.forEach(r => r.style.opacity = "1"); }
         }, 45);
-      }, t0);
+      }, 250 + i * 200);
     });
-    // one full-mark stutter at the end, like the splash hard-cut
     setTimeout(() => {
       [60, 130, 200].forEach((d, i) =>
         setTimeout(() => mark.style.opacity = (i === 1 ? ".25" : "1"), d));
     }, 1350);
   }
 
-  /* ============ live "watch it think" demo ============ */
+  /* ============ live dash miniature ============
+     Faithful to wapow_dash.py's real rendering: segment-ladder tach with
+     non-linear scale, chip row, corner-bend gauge cards, G-circle, and the
+     PARKED / SPIRITED-grid / alert-triage layouts from real screenshots. */
   const cvs = document.getElementById("demo");
   const cap = document.getElementById("demo-cap");
   if (!cvs) return;
   const ctx = cvs.getContext("2d");
-  const W = 960, H = 430;
+  const W = 1024, H = 600;
 
-  const C = {
-    bg: "#0b0e13", panel: "#131926", line: "#1c2436", teal: "#37e0c0",
-    dim: "#6b7688", text: "#eef2f8", amber: "#ffb648", red: "#ff5462",
-    redHi: "#ff8d99", blue: "#4aa8ff", green: "#3ddc68"
-  };
-  const MODE_COLOR = { CRUISING: C.blue, SPIRITED: C.amber, RACING: C.red };
+  const BG = "#0b0e13", PANEL = "#131926", TEXT = "#eef2f8", DIM = "#6b7688",
+        TEAL = "#37e0c0", AMBER = "#ffb648", RED = "#ff5462", YELLOW = "#ffdd33",
+        GREENISH = "#aae66e", TRACK = "#232d3f", UNLIT = "#1a2230", UNLIT_RED = "#2a161c",
+        PARKED_C = "#8b93a7";
+  const MODE_COLOR = { PARKED: PARKED_C, SPIRITED: AMBER, RACING: RED };
+  const NUMFONT = "Bahnschrift, 'Arial Narrow', 'Segoe UI', sans-serif";
 
-  // the scripted drive: [end-time, mode, alert?, caption, sub]
+  /* ----- the scripted drive: [end, layout, mode, alerts[], knock, caption, sub] */
   const PHASES = [
-    [5,  "CRUISING", false, "Sunday drive. Speed front and center, everything else small and quiet.",
-                            "the layout doesn't fidget — rule #1"],
-    [6.5,"SPIRITED", false, "You push it — the dash catches up INSTANTLY.",
-                            "escalation is immediate, always"],
-    [11, "SPIRITED", false, "G-forces and performance data promote themselves to the front row.",
-                            "nothing moved that didn't need to"],
-    [17, "RACING",   false, "Full attack. Only what matters, sized to read at a glance.",
-                            "RPM bar stays put — peripheral vision owns it"],
-    [22, "RACING",   true,  "Oil pressure drops — the sentinel gauge seizes the screen.",
-                            "deviation from normal-for-this-RPM, not a raw number"],
-    [27, "CRUISING", false, "Trouble clears, you back off. The dash de-escalates slowly, one level at a time.",
-                            "escalate fast, de-escalate slow — rule #2"]
+    [4,  "parked",  "PARKED",   [], 0,
+      "Parked. Everything on screen, nothing shouting — the dash idles as calm as the engine.",
+      "the layout never fidgets — rule #1"],
+    [10, "grid",    "SPIRITED", [], 0,
+      "You pull away hard — SPIRITED before the corner exit. G-forces and the full grid promote in.",
+      "escalation is instant, always"],
+    [15, "grid",    "RACING",   [], 0,
+      "Full attack. Redline segments flashing, every number sized to read at a glance.",
+      "the RPM bar never moves — peripheral vision owns it"],
+    [21, "alert3",  "RACING",   ["! AFR LEAN", "! OIL TEMP", "! OIL PRESS"], 0,
+      "Oil pressure craters — then oil temp and AFR pile in. Three alerts, three slots, ranked by what kills the engine first.",
+      "sentinel gauges seize the screen — you cannot miss this"],
+    [26, "alert1",  "RACING",   ["! OIL TEMP"], 3,
+      "You back off. Two alerts clear; the survivor holds the big slot while the engine cools. Knock logged 3 events.",
+      "deviation from normal-for-this-RPM, not raw numbers"],
+    [30, "grid",    "SPIRITED", [], 3,
+      "Cool-down lap. The dash de-escalates slowly, one level at a time. No flicker, no drama.",
+      "escalate fast, de-escalate slow — rule #2"]
   ];
-  const LOOP = 27;
+  const LOOP = 30;
 
-  // smoothed live values — gauges sweep, they don't teleport
-  const val = { rpm: 2100, speed: 46, gx: 0, gy: 0, oil: 2.4 };
+  /* smoothed live values — gauges sweep, they don't teleport */
+  const v = { rpm: 0, mph: 0, gx: 0, gy: 0, oilP: 0, oilT: 198, afr: 14.7,
+              boost: -13, water: 178, fuelP: 0 };
   const lerp = (a, b, k) => a + (b - a) * k;
+  const trail = [];   // recent G-dot positions
 
-  function targets(t, phase) {
-    const mode = phase[1], alert = phase[2];
-    let rpm, speed, gx, gy;
-    if (mode === "CRUISING") {
-      rpm = 2100 + 200 * Math.sin(t * 1.3);
-      speed = 46 + 4 * Math.sin(t * .7);
-      gx = .06 * Math.sin(t * .9); gy = .05 * Math.sin(t * 1.4);
+  function targets(t, ph) {
+    const mode = ph[1] === "parked" ? "PARKED" : ph[2];
+    const layout = ph[1];
+    let o = {};
+    if (layout === "parked") {
+      const running = t > 1.5;                    // engine catches at 1.5 s
+      o = { rpm: running ? 900 + 60 * Math.sin(t * 6) : 0, mph: 0, gx: 0, gy: 0,
+            oilP: running ? 26 : 0, oilT: 198, afr: 14.7, boost: -13,
+            water: 178, fuelP: running ? 50 : 0 };
     } else if (mode === "SPIRITED") {
-      rpm = 4600 + 1700 * Math.sin(t * 2.2);
-      speed = 68 + 16 * Math.sin(t * 1.1);
-      gx = .62 * Math.sin(t * 1.8); gy = .45 * Math.sin(t * 2.6);
-    } else {
-      rpm = 6400 + 1300 * Math.sin(t * 3.6);
-      speed = 94 + 22 * Math.sin(t * 1.3);
-      gx = 1.05 * Math.sin(t * 2.2); gy = .85 * Math.sin(t * 3.1);
+      const cool = t > 26;                        // the cool-down lap is gentler
+      o = { rpm: (cool ? 2600 : 4100) + 1400 * Math.sin(t * 2.2),
+            mph: cool ? 55 : 78 + 8 * Math.sin(t * 1.1),
+            gx: (cool ? .25 : .5) * Math.sin(t * 1.8),
+            gy: (cool ? .18 : .38) * Math.sin(t * 2.6),
+            oilP: 0, oilT: cool ? 232 : 212, afr: 14.0 + .5 * Math.sin(t * 3),
+            boost: -4 + 8 * Math.sin(t * 2.2), water: 186, fuelP: 52 };
+    } else { // RACING phases
+      const alert3 = layout === "alert3", alert1 = layout === "alert1";
+      o = { rpm: alert1 ? 3800 : 6300 + 1100 * Math.sin(t * 3.6),
+            mph: alert1 ? 77 : 96 + 20 * Math.sin(t * 1.3),
+            gx: (alert1 ? .3 : 1.0) * Math.sin(t * 2.2),
+            gy: (alert1 ? .2 : .8) * Math.sin(t * 3.1),
+            oilP: 0, oilT: alert3 ? 249 : (alert1 ? 280 : 224),
+            afr: alert3 ? 13.9 : 12.0 + .4 * Math.sin(t * 4),
+            boost: alert3 ? 18 : 15 + 4 * Math.sin(t * 2.8),
+            water: 191, fuelP: alert3 ? 69 : 62 };
     }
-    // oil pressure normally tracks rpm; the alert phase starves it
-    const expected = 1.0 + (rpm / 8000) * 3.5;
-    const oil = alert ? 0.9 : expected + .12 * Math.sin(t * 5);
-    return { rpm, speed, gx, gy, oil, expected };
+    // oil pressure tracks rpm (the deviation rule) — unless the failure is on
+    const expected = 8 + (o.rpm / 9000) * 68;
+    if (layout === "alert3") o.oilP = 34;                     // starved
+    else if (layout === "alert1") o.oilP = 44;
+    else if (o.oilP === 0) o.oilP = expected;
+    o.expected = expected;
+    return o;
   }
 
-  function roundRect(x, y, w, h, r) {
+  function rr(x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -385,146 +406,254 @@
     ctx.closePath();
   }
 
-  function drawRPM(t) {
-    const x = 16, y = 16, w = W - 32, h = 36;
-    ctx.fillStyle = C.panel; roundRect(x, y, w, h, 5); ctx.fill();
-    const frac = Math.min(val.rpm / 8000, 1);
-    const col = val.rpm > 6800 ? C.red : val.rpm > 5600 ? C.amber : C.teal;
-    ctx.fillStyle = col;
-    roundRect(x + 2, y + 2, Math.max((w - 4) * frac, 8), h - 4, 4); ctx.fill();
-    // redline flash
-    if (val.rpm > 7300 && Math.floor(t * 8) % 2 === 0) {
-      ctx.fillStyle = "rgba(255,255,255,.85)";
-      roundRect(x + 2, y + 2, (w - 4) * frac, h - 4, 4); ctx.fill();
+  /* ----- segment-ladder tach: 48 cells, non-linear scale (400-4000 rpm =
+     first third, 4000-9000 = the rest), colors anchored to rpm values ----- */
+  const SEGS = 48, RPM_MIN = 400, RPM_MAX = 9000, REDLINE = 7000;
+  const segRpm = i => {
+    const z = i / (SEGS - 1);
+    return z <= 1 / 3 ? RPM_MIN + z * 3 * (4000 - RPM_MIN)
+                      : 4000 + (z - 1 / 3) * 1.5 * (RPM_MAX - 4000);
+  };
+  let peakRpm = 0;
+  function tach(t) {
+    const x0 = 210, x1 = 1004, y = 14, h = 52;
+    const pitch = (x1 - x0) / SEGS;
+    const flash = v.rpm > REDLINE - 500 && Math.floor(t * 8) % 2 === 0;
+    for (let i = 0; i < SEGS; i++) {
+      const r = segRpm(i), lit = r <= Math.max(v.rpm, RPM_MIN + 1);
+      let col;
+      if (lit) col = flash ? RED :
+                     r >= REDLINE ? RED :
+                     r >= REDLINE - 700 ? YELLOW :
+                     r >= REDLINE - 1200 ? GREENISH : TEAL;
+      else col = r >= REDLINE ? UNLIT_RED : UNLIT;
+      ctx.fillStyle = col;
+      rr(x0 + i * pitch, y, pitch - 3, h, 3); ctx.fill();
     }
-    ctx.fillStyle = C.dim; ctx.font = "11px Consolas, monospace";
-    for (let k = 1; k < 8; k++) {
-      const tx = x + (w * k / 8);
-      ctx.fillRect(tx, y + h + 3, 1, 5);
-      ctx.fillText(k, tx - 3, y + h + 18);
+    peakRpm = Math.max(peakRpm * .999, v.rpm);          // peak-hold tell-tale
+    const pz = peakRpm <= 4000 ? (peakRpm - RPM_MIN) / (4000 - RPM_MIN) / 3
+                               : 1 / 3 + (peakRpm - 4000) / (RPM_MAX - 4000) * 2 / 3;
+    ctx.fillStyle = TEXT;
+    ctx.fillRect(x0 + pz * (x1 - x0), y - 2, 2.5, h + 4);
+    // big yellow rpm number
+    ctx.fillStyle = YELLOW; ctx.font = "bold 46px " + NUMFONT;
+    ctx.textAlign = "left"; ctx.fillText(Math.round(v.rpm), 34, 58);
+  }
+
+  /* ----- chip row ----- */
+  function chip(x, y, w, label, col, opts = {}) {
+    ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+    if (opts.fill) { ctx.fillStyle = opts.fill; rr(x, y, w, 26, 13); ctx.fill(); }
+    rr(x, y, w, 26, 13); ctx.stroke();
+    ctx.fillStyle = col; ctx.font = "bold 12px " + NUMFONT;
+    ctx.textAlign = "center"; ctx.fillText(label, x + w / 2, y + 17.5);
+    if (opts.badge) {
+      ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(x + w - 3, y + 2, 8, 0, 7); ctx.fill();
+      ctx.fillStyle = TEXT; ctx.font = "bold 10px " + NUMFONT;
+      ctx.fillText(opts.badge, x + w - 3, y + 5.5);
     }
-    ctx.fillStyle = C.text; ctx.font = "bold 15px Consolas, monospace";
-    ctx.textAlign = "right";
-    ctx.fillText(Math.round(val.rpm) + " rpm", x + w - 8, y + h + 18);
     ctx.textAlign = "left";
   }
-
-  function badge(mode, alert, t) {
-    const col = MODE_COLOR[mode];
-    ctx.fillStyle = C.panel; roundRect(16, 78, 170, 34, 6); ctx.fill();
-    ctx.strokeStyle = col; ctx.lineWidth = 1.5; roundRect(16, 78, 170, 34, 6); ctx.stroke();
-    ctx.fillStyle = col; ctx.font = "bold 16px Consolas, monospace";
-    ctx.textAlign = "center"; ctx.fillText(mode, 101, 101); ctx.textAlign = "left";
-    if (alert) {
-      const on = Math.floor(t * 5) % 2 === 0;
-      ctx.fillStyle = on ? C.red : C.panel; roundRect(198, 78, 96, 34, 6); ctx.fill();
-      ctx.fillStyle = on ? C.bg : C.red; ctx.font = "bold 14px Consolas, monospace";
-      ctx.textAlign = "center"; ctx.fillText("ALERT", 246, 100); ctx.textAlign = "left";
-    }
+  function chipRow(mode, alerts, knock, t) {
+    const y = 72;
+    ctx.fillStyle = DIM;                                    // log nav arrows
+    ctx.beginPath(); ctx.moveTo(38, y + 6); ctx.lineTo(26, y + 13); ctx.lineTo(38, y + 20); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(46, y + 6); ctx.lineTo(58, y + 13); ctx.lineTo(46, y + 20); ctx.fill();
+    chip(88, y, 48, "CEL", "#3a4356");
+    chip(150, y, 48, "LOG", mode === "PARKED" ? "#3a4356" : RED);
+    chip(212, y, 74, "KNOCK", "#3a4356", knock ? { badge: knock } : {});
+    chip(342, y, 66, "SETUP", DIM);
+    // alert chips queue leftward from the mode pill
+    const mc = MODE_COLOR[mode];
+    const blink = Math.floor(t * 5) % 2 === 0;
+    chip(868, y, 132, mode, mc, { fill: mode === "RACING" ? "#2a1218" : undefined });
+    alerts.forEach((a, i) => {
+      const x = 868 - (i + 1) * 150;
+      chip(x, y, 138, a, blink ? "#ff8d99" : RED, { fill: "#2a1218" });
+    });
   }
 
-  function gauge(x, y, w, h, label, value, unit, col, opts = {}) {
-    ctx.globalAlpha = opts.dimmed ? .35 : 1;
-    ctx.fillStyle = C.panel; roundRect(x, y, w, h, 7); ctx.fill();
-    if (opts.alarm) {
-      const on = Math.floor(opts.t * 5) % 2 === 0;
-      ctx.strokeStyle = on ? C.redHi : C.red; ctx.lineWidth = 3;
-      roundRect(x, y, w, h, 7); ctx.stroke();
+  /* ----- corner-bend gauge card (the real dash's signature element) -----
+     A thick bar runs up the card's left edge, bends at the top-left corner,
+     and wraps along the top. 0-45% of scale fills the left run; nominal
+     lands mid-bend. */
+  function bendCard(x, y, w, h, label, valTxt, unit, frac, opts = {}) {
+    const alarm = opts.alarm, dimmed = opts.dimmed, big = opts.big;
+    ctx.globalAlpha = dimmed ? .55 : 1;
+    ctx.fillStyle = PANEL; rr(x, y, w, h, 10); ctx.fill();
+    ctx.strokeStyle = alarm ? RED : TRACK; ctx.lineWidth = alarm ? 1.8 : 1;
+    rr(x, y, w, h, 10); ctx.stroke();
+
+    const th = big ? 17 : 11;                       // bar thickness
+    const inset = 12 + th / 2;
+    const bx = x + inset, byTop = y + inset, byBot = y + h - 14;
+    const rad = big ? 26 : 18;
+    const topEnd = x + w - 14;
+    // track along the top run
+    ctx.lineCap = "round"; ctx.lineWidth = th * .66; ctx.strokeStyle = TRACK;
+    ctx.beginPath(); ctx.moveTo(bx + rad, byTop); ctx.lineTo(topEnd, byTop); ctx.stroke();
+    // bar path: bottom → up → bend → along top; frac maps 45% to mid-bend
+    const seg1 = byBot - (byTop + rad), arc = Math.PI * rad / 2,
+          seg2 = topEnd - (bx + rad), toMid = seg1 + arc / 2;
+    const d = frac <= .45 ? (frac / .45) * toMid
+                          : toMid + ((frac - .45) / .55) * (arc / 2 + seg2);
+    ctx.strokeStyle = alarm ? (Math.floor((opts.t || 0) * 5) % 2 === 0 ? "#ff8d99" : RED)
+                            : opts.col || TEAL;
+    ctx.lineWidth = th;
+    ctx.beginPath();
+    let px, py;                                   // bar tip for the dot
+    if (d <= seg1) {
+      ctx.moveTo(bx, byBot); ctx.lineTo(bx, byBot - d); px = bx; py = byBot - d;
+    } else if (d <= seg1 + arc) {
+      ctx.moveTo(bx, byBot); ctx.lineTo(bx, byTop + rad);
+      const a = Math.PI + (d - seg1) / rad;
+      ctx.arc(bx + rad, byTop + rad, rad, Math.PI, a);
+      px = bx + rad + rad * Math.cos(a); py = byTop + rad + rad * Math.sin(a);
+    } else {
+      ctx.moveTo(bx, byBot); ctx.lineTo(bx, byTop + rad);
+      ctx.arc(bx + rad, byTop + rad, rad, Math.PI, Math.PI * 1.5);
+      px = Math.min(bx + rad + (d - seg1 - arc), topEnd); py = byTop;
+      ctx.lineTo(px, py);
     }
-    ctx.fillStyle = C.dim; ctx.font = "12px Consolas, monospace";
-    ctx.fillText(label, x + 14, y + 24);
-    ctx.fillStyle = col;
-    ctx.font = "bold " + Math.min(h * .42, w * .28) + "px Consolas, monospace";
-    ctx.fillText(value, x + 14, y + h / 2 + Math.min(h * .17, 30));
-    ctx.fillStyle = C.dim; ctx.font = "13px Consolas, monospace";
-    ctx.fillText(unit, x + 14, y + h - 14);
+    ctx.stroke();
+    ctx.fillStyle = TEXT;                          // tip dot + nominal marker
+    ctx.beginPath(); ctx.arc(px, py, th * .28, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(bx + rad + seg2 * .55, byTop, 3, 0, 7); ctx.fill();
+
+    const vcol = alarm ? RED : TEXT;
+    const vs = big ? 76 : Math.min(h * .38, 34);
+    ctx.fillStyle = vcol; ctx.font = "bold " + vs + "px " + NUMFONT;
+    const tx = x + inset + th / 2 + (big ? 26 : 16);
+    const vw = ctx.measureText(valTxt).width;      // measure BEFORE font changes
+    ctx.fillText(valTxt, tx, y + h / 2 + (big ? 4 : 6));
+    ctx.fillStyle = alarm ? RED : DIM; ctx.font = "bold " + (big ? 15 : 11) + "px " + NUMFONT;
+    ctx.fillText(unit, tx + vw + (big ? 10 : 6), y + h / 2 + (big ? 12 : 9));
+    ctx.fillStyle = alarm ? RED : DIM;
+    ctx.font = (big ? "bold 26px " : "bold 14px ") + NUMFONT;
+    ctx.fillText(label, tx, y + h - (big ? 24 : 14));
+    if (opts.sentinel) {                           // sentinel home-row dot
+      ctx.fillStyle = TEAL; ctx.beginPath(); ctx.arc(x + 12, y + h - 12, 4, 0, 7); ctx.fill();
+    }
     ctx.globalAlpha = 1;
   }
 
-  // deviation bar: needle distance from "normal for right now"
-  function devBar(x, y, w, dev, alarm, t) {
-    ctx.strokeStyle = C.line; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.stroke();
-    ctx.fillStyle = C.dim; ctx.fillRect(x + w / 2 - 1, y - 7, 2, 14);
-    const px = x + w / 2 + Math.max(-1, Math.min(1, dev)) * (w / 2);
-    ctx.fillStyle = alarm ? (Math.floor(t * 5) % 2 === 0 ? C.redHi : C.red) : C.teal;
-    ctx.beginPath(); ctx.arc(px, y, 7, 0, 7); ctx.fill();
-  }
-
-  function gCircle(x, y, r, t, dimmed) {
-    ctx.globalAlpha = dimmed ? .35 : 1;
-    ctx.strokeStyle = C.line; ctx.lineWidth = 1.5;
-    [1, .5].forEach(k => { ctx.beginPath(); ctx.arc(x, y, r * k, 0, 7); ctx.stroke(); });
-    ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y);
-    ctx.moveTo(x, y - r); ctx.lineTo(x, y + r); ctx.stroke();
-    const dx = x + val.gx * r * .85, dy = y + val.gy * r * .85;
-    ctx.fillStyle = C.teal;
-    ctx.shadowColor = C.teal; ctx.shadowBlur = dimmed ? 0 : 12;
-    ctx.beginPath(); ctx.arc(dx, dy, 8, 0, 7); ctx.fill();
-    ctx.shadowBlur = 0;
-    const g = Math.hypot(val.gx, val.gy);
-    ctx.fillStyle = C.text; ctx.font = "bold 20px Consolas, monospace";
-    ctx.textAlign = "center"; ctx.fillText(g.toFixed(2) + " g", x, y + r + 26);
-    ctx.textAlign = "left"; ctx.globalAlpha = 1;
-  }
-
-  function sentinels(alert, t) {
-    const labels = ["OILP", "FUELP", "AFR"], y = H - 46;
-    labels.forEach((L, i) => {
-      const x = 16 + i * 120;
-      const bad = alert && i === 0;
-      const on = Math.floor(t * 5) % 2 === 0;
-      ctx.fillStyle = bad && on ? C.red : C.panel; roundRect(x, y, 108, 30, 5); ctx.fill();
-      ctx.fillStyle = bad ? (on ? C.bg : C.red) : C.green;
-      ctx.beginPath(); ctx.arc(x + 16, y + 15, 4, 0, 7); ctx.fill();
-      ctx.fillStyle = bad ? (on ? C.bg : C.red) : C.dim;
-      ctx.font = "bold 13px Consolas, monospace";
-      ctx.fillText(L, x + 30, y + 20);
+  /* ----- G-circle with trail ----- */
+  function gCircle(cx, cy, r) {
+    ctx.strokeStyle = TRACK; ctx.lineWidth = 1.5;
+    [r, r * .55].forEach(k => { ctx.beginPath(); ctx.arc(cx, cy, k, 0, 7); ctx.stroke(); });
+    ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy);
+    ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
+    const dx = cx + v.gx / 1.3 * r, dy = cy + v.gy / 1.3 * r;
+    trail.push([dx, dy]); if (trail.length > 14) trail.shift();
+    trail.forEach(([tx2, ty2], i) => {
+      ctx.fillStyle = "rgba(55,224,192," + (i / trail.length * .4) + ")";
+      ctx.beginPath(); ctx.arc(tx2, ty2, 5, 0, 7); ctx.fill();
     });
-    ctx.fillStyle = C.dim; ctx.font = "11px Consolas, monospace";
-    ctx.fillText("SENTINEL ROW — always on duty", 16 + 3 * 120 + 8, H - 26);
+    ctx.fillStyle = TEAL; ctx.beginPath(); ctx.arc(dx, dy, 8, 0, 7); ctx.fill();
+    const g = Math.hypot(v.gx, v.gy);
+    ctx.fillStyle = DIM; ctx.font = "bold 14px " + NUMFONT; ctx.textAlign = "center";
+    ctx.fillText(g.toFixed(2) + " g", cx, cy + r + 22); ctx.textAlign = "left";
+  }
+  function mphBlock(cx, cy, size) {
+    ctx.fillStyle = TEXT; ctx.font = "bold " + size + "px " + NUMFONT;
+    ctx.textAlign = "center"; ctx.fillText(Math.round(v.mph), cx, cy);
+    ctx.fillStyle = DIM; ctx.font = "bold 15px " + NUMFONT;
+    ctx.fillText("MPH", cx, cy + 26); ctx.textAlign = "left";
+  }
+  /* ----- small horizontal-bar card (FUEL / ETH) ----- */
+  function hCard(x, y, w, h, label, pct) {
+    ctx.fillStyle = PANEL; rr(x, y, w, h, 8); ctx.fill();
+    ctx.strokeStyle = TRACK; ctx.lineWidth = 1; rr(x, y, w, h, 8); ctx.stroke();
+    ctx.lineCap = "round"; ctx.lineWidth = 7;
+    ctx.strokeStyle = TRACK;
+    ctx.beginPath(); ctx.moveTo(x + 14, y + 14); ctx.lineTo(x + w - 14, y + 14); ctx.stroke();
+    ctx.strokeStyle = TEAL;
+    ctx.beginPath(); ctx.moveTo(x + 14, y + 14); ctx.lineTo(x + 14 + (w - 28) * pct / 100, y + 14); ctx.stroke();
+    ctx.fillStyle = TEXT; ctx.font = "bold 19px " + NUMFONT;
+    ctx.fillText(pct.toFixed(0), x + 14, y + h - 12);
+    ctx.fillStyle = DIM; ctx.font = "bold 10px " + NUMFONT;
+    ctx.fillText("%", x + 14 + 24, y + h - 13);
+    ctx.fillText(label, x + w * .45, y + h - 12);
+  }
+
+  /* ----- layouts (traced from real WAPOW_SNAPSHOT frames) ----- */
+  function layoutParked(tgt, t) {
+    hCard(122, 252, 296, 68, "FUEL", 78);
+    hCard(122, 342, 296, 68, "ETH", 63);
+    bendCard(542, 170, 228, 110, "WATER", Math.round(v.water) + "", "°F", .45, { t });
+    bendCard(542, 300, 228, 110, "OIL TEMP", Math.round(v.oilT) + "", "°F", .45, { t });
+    bendCard(475, 490, 168, 92, "OIL PRESS", Math.round(v.oilP) + "", "PSI", v.oilP ? .4 : .05, { sentinel: true, t });
+    bendCard(656, 490, 172, 92, "AFR", v.afr.toFixed(1), "A/F", .5, { sentinel: true, t });
+    bendCard(841, 490, 168, 92, "FUEL PRESS", Math.round(v.fuelP) + "", "PSI", v.fuelP ? .45 : .05, { sentinel: true, t });
+  }
+  function layoutGrid(tgt, t) {
+    gCircle(155, 220, 86);
+    mphBlock(155, 388, 62);
+    hCard(45, 440, 215, 58, "FUEL", 75);
+    hCard(45, 512, 215, 58, "ETH", 63);
+    const dev = (v.oilP - tgt.expected) / 40;         // deviation drives the bar
+    const cells = [
+      ["WATER", Math.round(v.water) + "", "°F", .42],
+      ["BOOST", v.boost.toFixed(1), "PSI", .35 + Math.max(0, v.boost) / 60],
+      ["OIL TEMP", Math.round(v.oilT) + "", "°F", .44],
+      ["AFR", v.afr.toFixed(1), "A/F", .5],
+      ["OIL PRESS", Math.round(v.oilP) + "", "PSI", .45 + dev],
+      ["FUEL PRESS", Math.round(v.fuelP) + "", "PSI", .46]
+    ];
+    cells.forEach((c, i) => {
+      const col = i % 2, row = Math.floor(i / 2);
+      bendCard(290 + col * 360, 140 + row * 148, 340, 132, c[0], c[1], c[2],
+               Math.max(.04, Math.min(1, c[3])), { t });
+    });
+  }
+  function layoutAlert3(tgt, t) {
+    bendCard(20, 150, 322, 290, "OIL PRESS", Math.round(v.oilP) + "", "PSI", .18, { alarm: true, big: true, t });
+    bendCard(352, 150, 322, 290, "OIL TEMP", Math.round(v.oilT) + "", "°F", .8, { alarm: true, big: true, t });
+    bendCard(684, 150, 320, 290, "AFR", v.afr.toFixed(1), "A/F", .72, { alarm: true, big: true, t });
+    bendCard(30, 456, 312, 126, "FUEL PRESS", Math.round(v.fuelP) + "", "PSI", .5, { dimmed: true, t });
+    bendCard(360, 456, 312, 126, "BOOST", v.boost.toFixed(1), "PSI", .7, { dimmed: true, t });
+    bendCard(690, 456, 314, 126, "WATER", Math.round(v.water) + "", "°F", .42, { dimmed: true, t });
+  }
+  function layoutAlert1(tgt, t) {
+    bendCard(22, 148, 484, 286, "OIL TEMP", Math.round(v.oilT) + "", "°F", .85, { alarm: true, big: true, t });
+    bendCard(520, 148, 484, 134, "OIL PRESS", Math.round(v.oilP) + "", "PSI", .42, { t });
+    bendCard(520, 300, 484, 134, "FUEL PRESS", Math.round(v.fuelP) + "", "PSI", .46, { t });
+    bendCard(22, 452, 232, 130, "AFR", v.afr.toFixed(1), "A/F", .5, { t });
+    bendCard(268, 452, 232, 130, "BOOST", v.boost.toFixed(1), "PSI", .4, { t });
+    bendCard(514, 452, 240, 130, "WATER", Math.round(v.water) + "", "°F", .42, { t });
+    mphBlock(885, 520, 66);
   }
 
   let capIdx = -1, t0 = null;
   function draw(now) {
-    if (t0 === null) t0 = now;              // loop starts at the calm cruise
+    if (t0 === null) t0 = now;
     const t = ((now - t0) / 1000) % LOOP;
-    const phase = PHASES.find(p => t < p[0]) || PHASES[0];
-    const [, mode, alert, capMain, capSub] = phase;
+    const ph = PHASES.find(p => t < p[0]) || PHASES[0];
+    const [, layout, mode, alerts, knock, capMain, capSub] = ph;
 
-    // ease live values toward targets — gauges sweep like real needles
-    const tgt = targets(t, phase);
-    val.rpm = lerp(val.rpm, tgt.rpm, .09);
-    val.speed = lerp(val.speed, tgt.speed, .09);
-    val.gx = lerp(val.gx, tgt.gx, .12);
-    val.gy = lerp(val.gy, tgt.gy, .12);
-    val.oil = lerp(val.oil, tgt.oil, .1);
+    const tgt = targets(t, ph);
+    v.rpm = lerp(v.rpm, tgt.rpm, .09);
+    v.mph = lerp(v.mph, tgt.mph, .08);
+    v.gx = lerp(v.gx, tgt.gx, .12);
+    v.gy = lerp(v.gy, tgt.gy, .12);
+    v.oilP = lerp(v.oilP, tgt.oilP, .07);
+    v.oilT = lerp(v.oilT, tgt.oilT, .04);
+    v.afr = lerp(v.afr, tgt.afr, .08);
+    v.boost = lerp(v.boost, tgt.boost, .1);
+    v.water = lerp(v.water, tgt.water, .05);
+    v.fuelP = lerp(v.fuelP, tgt.fuelP, .08);
 
-    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
-    drawRPM(t);
-    badge(mode, alert, t);
+    ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+    tach(t);
+    chipRow(mode, alerts, knock, t);
+    if (layout === "parked") layoutParked(tgt, t);
+    else if (layout === "grid") layoutGrid(tgt, t);
+    else if (layout === "alert3") layoutAlert3(tgt, t);
+    else layoutAlert1(tgt, t);
+    ctx.fillStyle = "#2a3242"; ctx.font = "bold 12px " + NUMFONT;
+    ctx.fillText("WAPOW", 20, H - 10);
 
-    const top = 126, bh = 220;
-    if (alert) {
-      // OIL PRESS seizes the big slot; everything else dims — triage rule
-      gauge(16, top, 560, bh, "OIL PRESSURE — LOW", val.oil.toFixed(1), "bar   (normal here: " + tgt.expected.toFixed(1) + ")", C.red, { alarm: true, t });
-      devBar(46, top + bh - 46, 500, (val.oil - tgt.expected) / 2.2, true, t);
-      gCircle(700, top + 96, 74, t, true);
-      gauge(800, top, 144, bh, "SPEED", Math.round(val.speed), "mph", C.text, { dimmed: true });
-    } else if (mode === "CRUISING") {
-      gauge(16, top, 400, bh, "SPEED", Math.round(val.speed), "mph", C.text);
-      gauge(432, top, 250, bh, "FUEL", "72", "%", C.dim);
-      gauge(698, top, 246, bh, "COOLANT", "188", "°F", C.dim);
-    } else {
-      gCircle(140, top + 96, 84, t, false);
-      gauge(300, top, 330, bh, "SPEED", Math.round(val.speed), "mph", C.text);
-      gauge(646, top, 298, bh, "OIL PRESS  Δ", (val.oil - tgt.expected >= 0 ? "+" : "") + (val.oil - tgt.expected).toFixed(1), "bar vs normal", C.teal);
-      devBar(668, top + bh - 40, 254, (val.oil - tgt.expected) / 2.2, false, t);
-    }
-    sentinels(alert, t);
-
-    // caption swap
-    const idx = PHASES.indexOf(phase);
+    const idx = PHASES.indexOf(ph);
     if (idx !== capIdx && cap) {
       capIdx = idx;
       cap.style.opacity = 0;
@@ -533,11 +662,9 @@
         cap.style.opacity = 1;
       }, 220);
     }
-
     if (!reduced) requestAnimationFrame(draw);
   }
-
-  if (reduced) { draw(13000); }               // static racing frame for reduced motion
+  if (reduced) { t0 = 0; draw(17500); }        // static triple-alert frame
   else requestAnimationFrame(draw);
 })();
 </script>
