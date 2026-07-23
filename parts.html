@@ -196,7 +196,7 @@
     <tr>
       <td class="part"><a href="https://www.amazon.com/s?k=samsung+evo+select+microsd+128gb">microSD card (Pi system)</a></td>
       <td>1</td><td class="price">$15</td><td><span class="chip have">ON THE BENCH</span></td>
-      <td class="note">⚠ Counterfeit minefield — only buy "Ships from / Sold by Amazon," and torture-test every card before trusting it (story below).</td>
+      <td class="note">⚠ Counterfeit minefield regardless of store — torture-test every card before trusting it (story below).</td>
     </tr>
     <tr>
       <td class="part"><a href="https://www.amazon.com/s?k=raspberry+pi+5+official+active+cooler">Pi 5 official active cooler</a></td>
@@ -344,10 +344,11 @@
 
 <div class="trust">
   <h3>Parts that failed us (so they don't fail you)</h3>
-  <p><em>Counterfeit microSD.</em> A "Samsung EVO" 128GB from a marketplace seller
-     died under test and got returned. Rule since then: storage only "Ships from /
-     Sold by Amazon" (or straight from the manufacturer), and every card gets a full
-     write-verify torture test before it touches the Pi.</p>
+  <p><em>Counterfeit microSD.</em> A "Samsung EVO" 128GB died under test and went
+     back for a refund — and it came from a walk-in local store, not some sketchy
+     marketplace. That's the lesson: counterfeit cards are everywhere, so the source
+     alone protects nobody. Every card gets a full write-verify torture test before
+     it touches the Pi, no matter where it came from.</p>
   <p><em>Clone TJA1050 CAN transceivers.</em> The chip on cheap MCP2515 modules
      initializes fine at 3.3V, then silently fails at bus signaling — it cost us an
      entire evening of "why is the bus dead." The fix that's now part of the design:
