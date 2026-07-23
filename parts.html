@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAPOW Parts List — build it yourself</title>
+<meta name="description" content="Every part in the real WAPOW build — the DIY shopping list for the open-source adaptive racing display. Tested hardware only, failures documented.">
+<style>
+  :root {
+    --bg:     #0b0e13;
+    --panel:  #131926;
+    --line:   #1c2436;
+    --teal:   #37e0c0;
+    --dim:    #6b7688;
+    --text:   #eef2f8;
+    --amber:  #ffb648;
+    --red:    #ff5462;
+    --blue:   #4aa8ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+  .mono { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    padding: 56px 0 40px; text-align: center;
+    background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(55,224,192,.08), transparent);
+  }
+  .wordmark { width: min(230px, 60vw); height: auto; display: block; margin: 0 auto; }
+  h1 {
+    font-size: 13px; letter-spacing: .4em; text-indent: .4em;
+    text-transform: uppercase; color: var(--teal); font-weight: 600;
+    margin-top: 34px; text-shadow: 0 0 18px rgba(55,224,192,.4);
+  }
+  .sub { color: var(--dim); max-width: 640px; margin: 14px auto 0; font-size: 17px; }
+  .sub em { color: var(--text); font-style: normal; }
+
+  .disclosure {
+    max-width: 720px; margin: 36px auto 0; padding: 16px 22px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-left: 3px solid var(--amber); border-radius: 8px;
+    font-size: 14.5px; color: var(--dim); text-align: left;
+  }
+  .disclosure strong { color: var(--text); }
+
+  section { padding: 34px 0 6px; }
+  h2 {
+    font-size: 12.5px; letter-spacing: .35em; text-indent: .35em;
+    text-transform: uppercase; color: var(--teal); font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .secnote { color: var(--dim); font-size: 14.5px; margin-bottom: 18px; }
+  .subtotal { color: var(--dim); font-size: 13.5px; margin: 10px 2px 0; text-align: right; }
+  .subtotal b { color: var(--text); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); font-size: 14.5px; min-width: 640px; }
+  th {
+    text-align: left; padding: 10px 14px; color: var(--dim);
+    font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.price { white-space: nowrap; color: var(--text); }
+  td.part a { color: var(--teal); text-decoration: none; }
+  td.part a:hover { text-decoration: underline; }
+  td.note { color: var(--dim); font-size: 13.5px; }
+  .chip {
+    display: inline-block; font-family: Consolas, monospace; font-size: 10.5px;
+    letter-spacing: .08em; padding: 1px 8px; border-radius: 9px;
+    border: 1px solid var(--line); color: var(--dim); white-space: nowrap;
+  }
+  .chip.have    { color: var(--teal);  border-color: rgba(55,224,192,.4); }
+  .chip.shipping{ color: var(--amber); border-color: rgba(255,182,72,.4); }
+  .chip.later   { color: var(--dim); }
+
+  .trust {
+    margin-top: 44px; padding: 24px; background: var(--panel);
+    border: 1px solid var(--line); border-left: 3px solid var(--red);
+    border-radius: 8px;
+  }
+  .trust h3 { color: var(--red); font-size: 15px; margin-bottom: 10px; }
+  .trust p { color: var(--dim); font-size: 14.5px; margin-bottom: 10px; }
+  .trust p:last-child { margin-bottom: 0; }
+  .trust em { color: var(--text); font-style: normal; }
+
+  .total {
+    margin: 44px auto 0; max-width: 560px; text-align: center;
+    padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .total b { color: var(--teal); font-size: 26px; display: block; }
+  .total span { color: var(--dim); font-size: 14px; }
+
+  footer { padding: 48px 0 64px; text-align: center; color: var(--dim); font-size: 14px; }
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .foot-links { display: flex; gap: 28px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+  .foot-disclosure { font-size: 12.5px; max-width: 520px; margin: 0 auto 18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" aria-label="WAPOW Labs home">
+  <svg class="wordmark" viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WAPOW">
+    <g fill="#ffffff">
+      <rect x="10" y="10" width="10" height="10"/><rect x="70" y="10" width="10" height="10"/>
+      <rect x="10" y="20" width="10" height="10"/><rect x="70" y="20" width="10" height="10"/>
+      <rect x="10" y="30" width="10" height="10"/><rect x="70" y="30" width="10" height="10"/>
+      <rect x="10" y="40" width="10" height="10"/><rect x="40" y="40" width="10" height="10"/><rect x="70" y="40" width="10" height="10"/>
+      <rect x="10" y="50" width="10" height="10"/><rect x="40" y="50" width="10" height="10"/><rect x="70" y="50" width="10" height="10"/>
+      <rect x="10" y="60" width="10" height="10"/><rect x="30" y="60" width="10" height="10"/><rect x="50" y="60" width="10" height="10"/><rect x="70" y="60" width="10" height="10"/>
+      <rect x="20" y="70" width="10" height="10"/><rect x="60" y="70" width="10" height="10"/>
+      <rect x="120" y="10" width="20" height="10"/><rect x="110" y="20" width="40" height="10"/>
+      <rect x="100" y="30" width="10" height="10"/><rect x="150" y="30" width="10" height="10"/>
+      <rect x="100" y="40" width="10" height="10"/><rect x="150" y="40" width="10" height="10"/>
+      <rect x="100" y="50" width="60" height="10"/>
+      <rect x="100" y="60" width="10" height="10"/><rect x="150" y="60" width="10" height="10"/>
+      <rect x="100" y="70" width="10" height="10"/><rect x="150" y="70" width="10" height="10"/>
+      <rect x="180" y="10" width="50" height="10"/>
+      <rect x="180" y="20" width="10" height="10"/><rect x="230" y="20" width="10" height="10"/>
+      <rect x="180" y="30" width="10" height="10"/><rect x="230" y="30" width="10" height="10"/>
+      <rect x="180" y="40" width="50" height="10"/>
+      <rect x="180" y="50" width="10" height="10"/><rect x="180" y="60" width="10" height="10"/><rect x="180" y="70" width="10" height="10"/>
+      <rect x="270" y="10" width="40" height="10"/>
+      <rect x="260" y="20" width="10" height="10"/><rect x="310" y="20" width="10" height="10"/>
+      <rect x="260" y="30" width="10" height="10"/><rect x="310" y="30" width="10" height="10"/>
+      <rect x="260" y="40" width="10" height="10"/><rect x="310" y="40" width="10" height="10"/>
+      <rect x="260" y="50" width="10" height="10"/><rect x="310" y="50" width="10" height="10"/>
+      <rect x="260" y="60" width="10" height="10"/><rect x="310" y="60" width="10" height="10"/>
+      <rect x="270" y="70" width="40" height="10"/>
+      <rect x="340" y="10" width="10" height="10"/><rect x="400" y="10" width="10" height="10"/>
+      <rect x="340" y="20" width="10" height="10"/><rect x="400" y="20" width="10" height="10"/>
+      <rect x="340" y="30" width="10" height="10"/><rect x="400" y="30" width="10" height="10"/>
+      <rect x="340" y="40" width="10" height="10"/><rect x="370" y="40" width="10" height="10"/><rect x="400" y="40" width="10" height="10"/>
+      <rect x="340" y="50" width="10" height="10"/><rect x="370" y="50" width="10" height="10"/><rect x="400" y="50" width="10" height="10"/>
+      <rect x="340" y="60" width="10" height="10"/><rect x="360" y="60" width="10" height="10"/><rect x="380" y="60" width="10" height="10"/><rect x="400" y="60" width="10" height="10"/>
+      <rect x="350" y="70" width="10" height="10"/><rect x="390" y="70" width="10" height="10"/>
+    </g>
+  </svg>
+  </a>
+  <h1>The Parts List</h1>
+  <p class="sub">Every part in the <em>real build</em> — the same hardware on the bench
+     right now. Nothing here is filler, nothing is untested. If a part burned us,
+     it's called out so it doesn't burn you.</p>
+
+  <div class="wrap">
+    <div class="disclosure">
+      <strong>As an Amazon Associate I earn from qualifying purchases.</strong>
+      Some links below are (or will become) affiliate links — prices never change
+      for you; a small cut funds development. Buy anywhere you like: the part
+      matters, not the store. Prices listed are typical at time of writing and drift.
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2>Dash core</h2>
+  <p class="secnote">The display brain — everything that rides in the enclosure.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Part</th><th>Qty</th><th>~Price</th><th>Status</th><th>Notes</th></tr>
+    <tr>
+      <td class="part"><a href="https://www.raspberrypi.com/products/raspberry-pi-5/">Raspberry Pi 5 (4GB)</a></td>
+      <td>1</td><td class="price">$60</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Buy from an official reseller (link lists them). 4GB is plenty — the dash targets 50 fps with room to spare.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=headsun+7+inch+1024x600+raspberry+pi+touchscreen">HeadSun 7" 1024×600 touchscreen</a></td>
+      <td>1</td><td class="price">$65</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Touch panel only reports while your finger moves — the dash's tap-only UI is designed around it. Works great for taps.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=mcp2515+can+bus+module+8mhz">MCP2515 CAN module (HW-184)</a></td>
+      <td>2</td><td class="price">$10/pr</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">⚠ The onboard TJA1050 transceiver does NOT work at 3.3V — see "parts that failed us" below. Plan the SN65HVD230 transplant.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=sn65hvd230+can+transceiver+board">SN65HVD230 breakout (VP230)</a></td>
+      <td>2</td><td class="price">$10/pr</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">The 3.3V transceivers that actually work. One replaces the MCP2515's onboard chip, one lives on the Teensy side.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.adafruit.com/search?q=LSM6DSOX">Adafruit LSM6DSOX IMU</a></td>
+      <td>1</td><td class="price">$12</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">The G-sensor behind the driving-mode logic. I2C, auto-detected by the dash software.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=samsung+evo+select+microsd+128gb">microSD card (Pi system)</a></td>
+      <td>1</td><td class="price">$15</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">⚠ Counterfeit minefield — only buy "Ships from / Sold by Amazon," and torture-test every card before trusting it (story below).</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=raspberry+pi+5+official+active+cooler">Pi 5 official active cooler</a></td>
+      <td>1</td><td class="price">$8</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">A dash lives in a car in the sun. Cool the Pi.</td>
+    </tr>
+  </table>
+  </div>
+  <p class="subtotal">section: <b>~$180</b></p>
+</section>
+
+<section>
+  <h2>Data acquisition</h2>
+  <p class="secnote">The fast-signals node (RPM, analog sensors) and the slow-data radio.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Part</th><th>Qty</th><th>~Price</th><th>Status</th><th>Notes</th></tr>
+    <tr>
+      <td class="part"><a href="https://www.pjrc.com/store/teensy41.html">Teensy 4.1</a></td>
+      <td>1</td><td class="price">$32</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Fast acquisition: ignition RPM, 8 analog channels, native CAN. Buy from PJRC directly or their listed resellers.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=obdlink+mx%2B+bluetooth">OBDLink MX+</a></td>
+      <td>1</td><td class="price">$120</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Slow engine data over Bluetooth. Gotcha: one host at a time — if your phone's OBD app auto-connects, the dash is locked out.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.pololu.com/search?query=D24V50F5">Pololu D24V50F5 buck (12V→5V, 5A)</a></td>
+      <td>1</td><td class="price">$20</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Clean 5A of 5V from automotive 12V. Bench-proven feeding the Pi + screen.</td>
+    </tr>
+  </table>
+  </div>
+  <p class="subtotal">section: <b>~$172</b></p>
+</section>
+
+<section>
+  <h2>Board-build consumables</h2>
+  <p class="secnote">What turns loose modules into a real, vibration-proof install. Much of
+     ours came from a beloved local electronics shop — links are equivalents.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Part</th><th>Qty</th><th>~Price</th><th>Status</th><th>Notes</th></tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=perfboard+prototype+board+kit">Perfboard blanks (assorted)</a></td>
+      <td>5</td><td class="price">$15</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Carrier boards for the Pi hat and the Teensy DAQ stack.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=female+pin+header+socket+strips+2.54mm">Female header socket strips</a></td>
+      <td>7+</td><td class="price">$8</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Socket everything — modules unplug for service instead of desoldering.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=2x20+idc+box+header">2×20 IDC box header</a></td>
+      <td>1</td><td class="price">$2</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">The Pi's GPIO lands here via ribbon cable.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=screw+terminal+block+pcb+mount">Screw terminal blocks (2/3-pos)</a></td>
+      <td>~20</td><td class="price">$8</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Every field wire lands on a screw terminal, not a solder joint.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=m2.5+m3+brass+standoff+kit">Brass standoffs (M2.5 + M3 kits)</a></td>
+      <td>kits</td><td class="price">$10</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Board stacking + enclosure mounting.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=100nf+ceramic+capacitor+50v">100nF ceramic caps</a></td>
+      <td>20+</td><td class="price">$3</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Decoupling on every supply pin. Cheap insurance.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=1n5818+schottky+diode">1N5818 Schottky diodes</a></td>
+      <td>6</td><td class="price">$2</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Power-path / reverse-polarity protection.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=bat85+schottky+diode">BAT85 small-signal Schottky</a></td>
+      <td>100</td><td class="price">$9</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Input clamps for the analog channels — sold in bags of 100, the build uses ~12.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=resistor+kit+1%2F4w+1%25">Resistor kit (incl. 2.2k / 3.3k)</a></td>
+      <td>1</td><td class="price">$13</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">The 2.2k/3.3k pairs build the 0–5V→3.3V divider on every analog input. Senders WILL kill an undivided pin.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=hookup+wire+kit+22awg+solid">Hookup wire assortment</a></td>
+      <td>1</td><td class="price">$10</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Board wiring. (Scrap Cat5 works in a pinch — ask us how we know.)</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=m3+heat+set+threaded+inserts">Heat-set inserts (M3/M2.5)</a></td>
+      <td>kit</td><td class="price">$12</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Threaded mounts for the 3D-printed enclosure.</td>
+    </tr>
+  </table>
+  </div>
+  <p class="subtotal">section: <b>~$92</b></p>
+</section>
+
+<section>
+  <h2>Car install</h2>
+  <p class="secnote">Power, protection, and sensors — the phase where the dash leaves the bench.</p>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Part</th><th>Qty</th><th>~Price</th><th>Status</th><th>Notes</th></tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=inline+blade+fuse+holder+12v">Inline blade fuse holder + 5A fuses</a></td>
+      <td>1</td><td class="price">$6</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Fuse at the source. Non-negotiable in a car.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=xt30+connector+pairs">XT30 connector pair (12V input)</a></td>
+      <td>1</td><td class="price">$4</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Keyed, compact, can't plug it in backwards.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=ring+terminal+crimp+kit">Ring terminals / crimp kit</a></td>
+      <td>1</td><td class="price">$6</td><td><span class="chip shipping">ORDERED</span></td>
+      <td class="note">Crimp, don't twist-and-tape.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=aem+30-2012+oil+temp+sensor">AEM 30-2012 temp sender</a></td>
+      <td>1</td><td class="price">$45</td><td><span class="chip have">ON THE BENCH</span></td>
+      <td class="note">Oil temp, 1/8" NPT. Currently being characterized against its published resistance table before it earns a channel.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=u-blox+gps+module+usb">u-blox GPS module (10–25Hz)</a></td>
+      <td>1</td><td class="price">$40</td><td><span class="chip later">LATER</span></td>
+      <td class="note">Future: lap timing and track maps.</td>
+    </tr>
+    <tr>
+      <td class="part"><a href="https://www.amazon.com/s?k=deutsch+dt+12+pin+connector+kit">Deutsch DT 12-pin bulkhead kit</a></td>
+      <td>1</td><td class="price">$25</td><td><span class="chip later">LATER</span></td>
+      <td class="note">The proper motorsports bulkhead for the sensor harness.</td>
+    </tr>
+  </table>
+  </div>
+  <p class="subtotal">section: <b>~$61 now, +$65 later</b></p>
+</section>
+
+<div class="trust">
+  <h3>Parts that failed us (so they don't fail you)</h3>
+  <p><em>Counterfeit microSD.</em> A "Samsung EVO" 128GB from a marketplace seller
+     died under test and got returned. Rule since then: storage only "Ships from /
+     Sold by Amazon" (or straight from the manufacturer), and every card gets a full
+     write-verify torture test before it touches the Pi.</p>
+  <p><em>Clone TJA1050 CAN transceivers.</em> The chip on cheap MCP2515 modules
+     initializes fine at 3.3V, then silently fails at bus signaling — it cost us an
+     entire evening of "why is the bus dead." The fix that's now part of the design:
+     desolder it and transplant an SN65HVD230 (that's why two are on the list).
+     Full wiring writeup ships with the build guide.</p>
+</div>
+
+<div class="total">
+  <span>Complete DIY build, screen to sensors, at typical prices:</span>
+  <b>≈ $450–520</b>
+  <span>Less if your parts drawer is already healthy — the consumables list is
+  half "stuff a hardware person owns anyway."</span>
+</div>
+
+</div>
+
+<footer>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="https://www.youtube.com/@wapowlabs">YouTube</a>
+    <a href="https://ko-fi.com/wapowlabs">Tip jar (Ko-fi)</a>
+    <a href="mailto:hello@wapowlabs.com">hello@wapowlabs.com</a>
+  </div>
+  <p class="foot-disclosure">As an Amazon Associate I earn from qualifying purchases.
+     The DIY build is free forever — parts links are the closest thing WAPOW has to
+     a business model until assembled units exist.</p>
+  © 2026 WAPOW Labs · WAPOW — Windowed Adaptive Performance Optimization Widget
+</footer>
+
+</body>
+</html>
