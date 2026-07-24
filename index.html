@@ -297,9 +297,20 @@
     <p class="h2sub">What got built, what broke on camera, and what's next on the
        bench. Issues go out when the build earns one — roughly monthly when things
        are moving, quieter when they're not. No spam, no hype — just the build.</p>
+    <!-- Direct iframe, NOT beehiiv's loader.js. The loader wraps the form in a
+         div{height:0;overflow:hidden} and depends on a postMessage resize
+         handshake to open it up; that handshake silently failed on 7/24 and the
+         signup form was invisible on the live site. A fixed-height iframe has no
+         handshake to fail. If the form's height ever changes, adjust here. -->
     <div style="max-width: 480px; margin: 0 auto;">
-      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="51b29904-e4ce-4523-ab5e-93c50e936b6e"></script>
+      <iframe src="https://subscribe-forms.beehiiv.com/v3/forms/51b29904-e4ce-4523-ab5e-93c50e936b6e"
+              title="Subscribe to the WAPOW Build Log"
+              style="width:100%; height:80px; border:0; display:block; color-scheme:normal;"
+              scrolling="no"></iframe>
     </div>
+    <noscript><p class="h2sub" style="margin-top:14px;">
+      Subscribe at <a href="https://wapowlabs.beehiiv.com/subscribe" style="color:var(--teal);">wapowlabs.beehiiv.com</a>.
+    </p></noscript>
   </div>
 </section>
 
