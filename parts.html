@@ -31,7 +31,7 @@
     padding: 56px 0 40px; text-align: center;
     background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(55,224,192,.08), transparent);
   }
-  .wordmark { width: min(230px, 60vw); height: auto; display: block; margin: 0 auto; }
+  .wordmark { width: min(230px, 60vw); height: auto; display: block; margin: 0 auto; overflow: visible; }
   h1 {
     font-size: 13px; letter-spacing: .4em; text-indent: .4em;
     text-transform: uppercase; color: var(--teal); font-weight: 600;
@@ -142,6 +142,16 @@
       <rect x="340" y="50" width="10" height="10"/><rect x="370" y="50" width="10" height="10"/><rect x="400" y="50" width="10" height="10"/>
       <rect x="340" y="60" width="10" height="10"/><rect x="360" y="60" width="10" height="10"/><rect x="380" y="60" width="10" height="10"/><rect x="400" y="60" width="10" height="10"/>
       <rect x="350" y="70" width="10" height="10"/><rect x="390" y="70" width="10" height="10"/>
+    </g>
+    <!-- ™ (US serial 50131306, filed 9/27/2026 — ™ only; ® is illegal until
+         it registers). Same pixel language at 40% scale: 4-unit pixels,
+         top-aligned to the caps, hanging past the 420 edge so WAPOW stays
+         centered — hence overflow:visible on .wordmark. -->
+    <g fill="#ffffff">
+      <rect x="416" y="10" width="12" height="4"/><rect x="420" y="14" width="4" height="16"/>
+      <rect x="432" y="10" width="4" height="20"/><rect x="448" y="10" width="4" height="20"/>
+      <rect x="436" y="14" width="4" height="4"/><rect x="444" y="14" width="4" height="4"/>
+      <rect x="440" y="18" width="4" height="4"/>
     </g>
   </svg>
   </a>
