@@ -150,6 +150,48 @@
     .hero-fade { animation: none; opacity: 1; transform: none; }
     .btn, .card { transition: none; }
   }
+
+  /* ---------- roadmap: the build as one lap ---------- */
+  .rm-map { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+            padding: 16px 12px 12px; box-shadow: 0 12px 60px rgba(0,0,0,.45); }
+  .rm-map svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .rm-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 22px; margin-top: 8px;
+               font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; font-size: 11.5px;
+               letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .rm-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+  .rm-legend .l-done i { background: var(--teal); box-shadow: 0 0 8px rgba(55,224,192,.6); }
+  .rm-legend .l-prog i { background: var(--amber); box-shadow: 0 0 8px rgba(255,182,72,.55); }
+  .rm-legend .l-ahead i { border: 2px solid #3a4658; }
+  .rm-phases { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+               gap: 14px; margin-top: 26px; }
+  .rm-phase { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 16px 18px; }
+  .rm-phase.is-prog { border-color: rgba(255,182,72,.38); }
+  .rm-phase-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-bottom: 8px; }
+  .rm-num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto;
+            font: 700 12px/1 Consolas, "Cascadia Mono", ui-monospace, monospace; }
+  .is-done .rm-num { background: var(--teal); color: var(--bg); box-shadow: 0 0 10px rgba(55,224,192,.45); }
+  .is-prog .rm-num { border: 2px solid var(--amber); color: var(--amber); }
+  .is-ahead .rm-num { border: 2px solid #3a4658; color: var(--dim); }
+  .rm-phase h3 { font-size: 15px; font-weight: 600; color: var(--text); }
+  .rm-chip { margin-left: auto; font: 600 10px/1 Consolas, "Cascadia Mono", ui-monospace, monospace;
+             letter-spacing: .14em; text-transform: uppercase; padding: 4px 7px; border-radius: 3px;
+             border: 1px solid; white-space: nowrap; }
+  .is-done .rm-chip { color: var(--teal); border-color: rgba(55,224,192,.4); }
+  .is-prog .rm-chip { color: var(--amber); border-color: rgba(255,182,72,.45); }
+  .is-ahead .rm-chip { color: var(--dim); border-color: var(--line); }
+  .rm-phase p { color: var(--dim); font-size: 14px; line-height: 1.5; }
+  .rm-you { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 34px; }
+  .rm-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .rm-btns .btn { padding: 10px 20px; font-size: 14px; }
+  .rm-stamp { text-align: center; margin-top: 28px; font-family: Consolas, "Cascadia Mono", ui-monospace, monospace;
+              font-size: 12px; letter-spacing: .08em; color: var(--dim); }
+  .rm-pulse { transform-box: fill-box; transform-origin: center; animation: rm-pulse 1.8s ease-out infinite; }
+  @keyframes rm-pulse { from { transform: scale(.55); opacity: .9; } to { transform: scale(1.9); opacity: 0; } }
+  .rm-late { transition: opacity .6s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    .rm-pulse { animation: none; opacity: .35; }
+    .rm-late { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -298,6 +340,77 @@
        and drivers who couldn't spare a glance — documented on camera from the
        first breadboard onward. Test car: a 2000 Impreza 2.5RS with an STI heart.
        Every failure ships as an episode.</p>
+  </div>
+</section>
+
+<section id="roadmap" class="rm-section" data-done="0.30" data-car="0.46" data-zone="0.57">
+  <div class="wrap">
+    <h2>Where the build is</h2>
+    <p class="h2sub">One lap, from idea to your dash.</p>
+
+    <div class="rm-map">
+      <svg viewBox="30 10 960 380" role="img"
+           aria-label="Development roadmap drawn as one lap of a race track. Done: concept, bench system, ride-along kit. In progress: road testing and production hardware. Ahead: certification, preorders, shipping."></svg>
+      <div class="rm-legend" aria-hidden="true">
+        <span class="l-done"><i></i>Done</span>
+        <span class="l-prog"><i></i>In progress</span>
+        <span class="l-ahead"><i></i>Ahead</span>
+      </div>
+    </div>
+
+    <ol class="rm-phases">
+      <li class="rm-phase is-done" data-at="0.04">
+        <div class="rm-phase-head"><span class="rm-num">1</span><h3>Concept</h3><span class="rm-chip">Done</span></div>
+        <p>A dash that reorders itself by how you're driving. Design rules written, first prototype on screen.</p>
+      </li>
+      <li class="rm-phase is-done" data-at="0.16">
+        <div class="rm-phase-head"><span class="rm-num">2</span><h3>Bench system</h3><span class="rm-chip">Done</span></div>
+        <p>Sensors to screen on the bench — Teensy, CAN bus, Raspberry Pi — with two custom boards built and validated.</p>
+      </li>
+      <li class="rm-phase is-done" data-at="0.28">
+        <div class="rm-phase-head"><span class="rm-num">3</span><h3>Ride-along kit</h3><span class="rm-chip">Done</span></div>
+        <p>The whole system in a 3D-printed case. It rode along in an STI in August and logged the entire drive.</p>
+      </li>
+      <li class="rm-phase is-prog" data-at="0.40">
+        <div class="rm-phase-head"><span class="rm-num">4</span><h3>Road testing</h3><span class="rm-chip">In progress</span></div>
+        <p>Every drive is logged, and the logs become the fix list. The first one changed how the dash shifts between modes.</p>
+      </li>
+      <li class="rm-phase is-prog" data-at="0.52">
+        <div class="rm-phase-head"><span class="rm-num">5</span><h3>Production hardware</h3><span class="rm-chip">In progress</span></div>
+        <p>A 12.3-inch widescreen, WAPOW's own circuit boards, a production case. Screen samples are on order.</p>
+      </li>
+      <li class="rm-phase is-ahead" data-at="0.66">
+        <div class="rm-phase-head"><span class="rm-num">6</span><h3>Certification</h3><span class="rm-chip">Ahead</span></div>
+        <p>FCC testing — the step any electronic product has to clear before it can be sold.</p>
+      </li>
+      <li class="rm-phase is-ahead" data-at="0.80">
+        <div class="rm-phase-head"><span class="rm-num">7</span><h3>Preorders</h3><span class="rm-chip">Ahead</span></div>
+        <p>Open once the hardware is final. Not before.</p>
+      </li>
+      <li class="rm-phase is-ahead" data-at="0.96">
+        <div class="rm-phase-head"><span class="rm-num">8</span><h3>Shipping</h3><span class="rm-chip">Ahead</span></div>
+        <p>Assembled, tested units, to your door.</p>
+      </li>
+    </ol>
+
+    <div class="rm-you">
+      <div class="card">
+        <h3>Buying one?</h3>
+        <p>Not yet. There are no preorders or deposits today. When they open, Build Log subscribers hear first.</p>
+        <div class="rm-btns"><a class="btn btn-primary" href="#build-log">Get the Build Log</a></div>
+      </div>
+      <div class="card">
+        <h3>Building one?</h3>
+        <p>If you're handy, you can start now. The code is free on GitHub, and the parts list is the exact
+           hardware on our bench. The step-by-step build guide isn't out yet.</p>
+        <div class="rm-btns">
+          <a class="btn btn-ghost" href="https://github.com/TMR177/WAPOW">Code on GitHub</a>
+          <a class="btn btn-ghost" href="/parts.html">Parts list</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="rm-stamp">Marker last moved September 2026</p>
   </div>
 </section>
 
@@ -818,6 +931,266 @@
       Object.keys(alarmState).forEach(k => delete alarmState[k]);
       requestAnimationFrame(draw);
     }, { once: true });
+  }
+})();
+</script>
+
+<script>
+/* ============ roadmap: the build as one lap of a track ============
+   The section's markup is the single source of truth. Each .rm-phase <li>
+   carries its spot on the lap (data-at, 0-1) and its state (is-done /
+   is-prog / is-ahead); this script draws the map from them, so the map and
+   the list can never disagree. To move the car: change data-done / data-car
+   / data-zone on the section, the phase classes, and "Marker last moved".
+   Motion: the car drives to its spot once when the map scrolls into view,
+   then a ghost light runs the rest of the lap to the flag while the amber
+   in-progress stretch gently pulses. None of it runs for visitors with
+   reduced motion turned on - they get the finished map. */
+(function () {
+  const NS = "http://www.w3.org/2000/svg";
+  /* One stylised circuit. Lap runs clockwise from start/finish on the main straight. */
+  const TRACK = "M 200 310 L 700 310 C 800 310 860 290 870 230 C 880 170 940 160 950 110 " +
+                "C 960 60 900 40 850 60 C 790 85 760 140 700 140 C 640 140 620 70 560 60 " +
+                "C 500 50 470 120 410 120 C 350 120 330 50 270 50 C 190 50 120 60 90 120 " +
+                "C 60 180 80 240 110 270 C 140 300 160 310 200 310 Z";
+  const VBW = 960;
+  const C = { bg: "#0b0e13", panel: "#131926", teal: "#37e0c0", amber: "#ffb648", ghost: "#d4fff4",
+              dim: "#6b7688", ring: "#3a4658", unlit: "#1c2436", surface: "#232d3f", text: "#eef2f8" };
+  const MONO = "Consolas, 'Cascadia Mono', ui-monospace, monospace";
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  /* a dasharray that shows only [a, b] of the path (lengths, not fractions) */
+  const windowDash = (a, b, L) => (b > a ? `0 ${a} ${b - a} ${L * 2}` : `0 ${L * 2}`);
+
+  document.querySelectorAll(".rm-section").forEach(init);
+
+  function init(sec, idx) {
+    const svg = sec.querySelector(".rm-map svg");
+    const DONE = +sec.dataset.done, CAR = +sec.dataset.car, ZONE = +sec.dataset.zone;
+    const phases = Array.from(sec.querySelectorAll(".rm-phase")).map(li => ({
+      at: +li.dataset.at, num: li.querySelector(".rm-num").textContent,
+      state: li.classList.contains("is-done") ? "done" : li.classList.contains("is-prog") ? "prog" : "ahead"
+    }));
+
+    const defs = el("defs", {}, svg);
+    const glow = el("filter", { id: "rm-glow-" + idx, x: "-50%", y: "-50%", width: "200%", height: "200%" }, defs);
+    el("feGaussianBlur", { stdDeviation: "3.5", result: "b" }, glow);
+    const m = el("feMerge", {}, glow);
+    el("feMergeNode", { in: "b" }, m); el("feMergeNode", { in: "SourceGraphic" }, m);
+    const GLOW = `url(#rm-glow-${idx})`;
+
+    /* layers, bottom to top */
+    const base  = el("path", { d: TRACK, fill: "none", stroke: C.unlit, "stroke-linejoin": "round" }, svg);
+    const surf  = el("path", { d: TRACK, fill: "none", stroke: C.surface, "stroke-linejoin": "round" }, svg);
+    const zone  = el("path", { d: TRACK, fill: "none", stroke: C.amber, opacity: "0", class: "rm-late" }, svg);
+    const lit   = el("path", { d: TRACK, fill: "none", stroke: C.teal,  "stroke-linecap": "round", filter: GLOW }, svg);
+    const prog  = el("path", { d: TRACK, fill: "none", stroke: C.amber, "stroke-linecap": "round", filter: GLOW }, svg);
+    const trail = [0, 1, 2].map(() => el("path", { d: TRACK, fill: "none", stroke: C.ghost, "stroke-linecap": "round", filter: GLOW, opacity: "0" }, svg));
+    const head  = el("circle", { fill: C.ghost, filter: GLOW, opacity: "0" }, svg);
+    const sf    = el("g", {}, svg);
+    const burst = el("circle", { fill: "none", stroke: C.text, opacity: "0" }, svg);
+    const marks = el("g", {}, svg);
+    const car   = el("g", {}, svg);
+    el("circle", { r: "16", fill: "none", stroke: C.amber, "stroke-width": "2", class: "rm-pulse" }, car);
+    const body  = el("polygon", { points: "-10,-8 12,0 -10,8 -5,0", fill: C.amber, filter: GLOW }, car);
+    const tag   = el("g", { opacity: "0", class: "rm-late" }, svg);
+    const lead  = el("line", { stroke: C.amber, "stroke-width": "1.5", "stroke-dasharray": "3 3" }, tag);
+    const tagBox = el("rect", { rx: "4", fill: C.bg, stroke: C.amber, "stroke-width": "1.5" }, tag);
+    const tagT1 = el("text", { fill: C.amber, "text-anchor": "middle", "font-family": MONO, "font-weight": "700" }, tag);
+    tagT1.textContent = "WE'RE HERE";
+    const tagT2 = el("text", { fill: C.dim, "text-anchor": "middle", "font-family": MONO }, tag);
+    tagT2.textContent = "testing + building in parallel";
+
+    const L = base.getTotalLength();
+    const pt = f => base.getPointAtLength(((f % 1) + 1) % 1 * L);
+    let k = 1, p = reduced ? CAR : 0, finished = reduced;
+
+    const markEls = phases.map(ph => {
+      const g = el("g", {}, marks);
+      const c = el("circle", {}, g);
+      const t = el("text", { "text-anchor": "middle", "dominant-baseline": "central", "font-family": MONO, "font-weight": "700" }, g);
+      t.textContent = ph.num;
+      return { ph, g, c, t };
+    });
+
+    /* everything that must stay a readable size on screen scales with k
+       (viewBox units per screen pixel), so a phone gets bigger marks */
+    function layout() {
+      const w = svg.getBoundingClientRect().width || VBW;
+      k = VBW / w;
+      const baseW = Math.max(22, 8 * k), litW = Math.max(6, 2.6 * k);
+      base.setAttribute("stroke-width", baseW);
+      surf.setAttribute("stroke-width", baseW - 6);
+      lit.setAttribute("stroke-width", litW);
+      prog.setAttribute("stroke-width", litW);
+      zone.setAttribute("stroke-width", litW * .7);
+      trail.forEach((t, i) => t.setAttribute("stroke-width", litW * [.8, .65, .5][i]));
+      head.setAttribute("r", Math.max(4.5, 1.9 * k));
+      burst.setAttribute("stroke-width", Math.max(2, 1.2 * k));
+      /* the dashed "still working through it" stretch, car -> end of the zone */
+      const seg = [0, CAR * L]; let pos = CAR * L; const dash = 10 * k, gap = 7 * k;
+      while (pos < ZONE * L) {
+        const d = Math.min(dash, ZONE * L - pos); seg.push(d); pos += d;
+        const g = Math.min(gap, Math.max(0, ZONE * L - pos)); seg.push(g); pos += g;
+      }
+      seg.push(0, L * 2);
+      zone.setAttribute("stroke-dasharray", seg.join(" "));
+
+      /* start/finish: checker strip across the track */
+      sf.replaceChildren();
+      const s0 = pt(0), cs = (baseW - 6) / 4;
+      for (let r = 0; r < 4; r++) for (let c2 = 0; c2 < 2; c2++)
+        el("rect", { x: s0.x - cs + c2 * cs, y: s0.y - 2 * cs + r * cs, width: cs, height: cs,
+                     fill: (r + c2) % 2 ? C.bg : C.text }, sf);
+      const sfl = el("text", { x: s0.x, y: s0.y + baseW / 2 + 15 * k, fill: C.dim, "text-anchor": "middle",
+                               "font-family": MONO, "font-size": 10 * k, "letter-spacing": 1.5 * k }, sf);
+      sfl.textContent = "START · FINISH";
+      burst.setAttribute("cx", s0.x); burst.setAttribute("cy", s0.y);
+
+      const R = Math.max(13, 9 * k);
+      markEls.forEach(({ ph, g, c, t }) => {
+        const q = pt(ph.at);
+        g.setAttribute("transform", `translate(${q.x} ${q.y})`);
+        c.setAttribute("r", R);
+        c.setAttribute("stroke-width", Math.max(2.2, 1.7 * k));
+        t.setAttribute("font-size", Math.max(12, 10 * k));
+      });
+      body.setAttribute("transform", `scale(${Math.max(1, .8 * k)})`);
+      draw();
+    }
+
+    function draw() {
+      lit.setAttribute("stroke-dasharray", `${Math.min(p, DONE) * L} ${L * 2}`);
+      prog.setAttribute("stroke-dasharray", windowDash(DONE * L, Math.max(DONE, p) * L, L));
+      const q = pt(p), q2 = pt(p + .002);
+      const ang = Math.atan2(q2.y - q.y, q2.x - q.x) * 180 / Math.PI;
+      car.setAttribute("transform", `translate(${q.x} ${q.y}) rotate(${ang})`);
+      markEls.forEach(({ ph, c, t }) => {
+        let s = "ahead";
+        if (ph.state === "done" && p >= ph.at - .003) s = "done";
+        if (ph.state === "prog" && (finished || p >= ph.at - .003)) s = "prog";
+        c.setAttribute("fill", s === "done" ? C.teal : C.panel);
+        c.setAttribute("stroke", s === "done" ? C.teal : s === "prog" ? C.amber : C.ring);
+        t.setAttribute("fill", s === "done" ? C.bg : s === "prog" ? C.amber : C.dim);
+      });
+      zone.setAttribute("opacity", finished ? ".7" : "0");
+      placeTag(q);
+      tag.setAttribute("opacity", finished ? "1" : "0");
+    }
+
+    function placeTag(q) {
+      /* on narrow screens the second line goes, so the box fits the infield
+         between the main straight and the back section without covering track */
+      const s = Math.max(1, k * .95), narrow = k > 1.8;
+      const f1 = 11 * s, f2 = 9 * s, pad = 9 * s;
+      tagT1.setAttribute("font-size", f1); tagT2.setAttribute("font-size", f2);
+      tagT2.style.display = narrow ? "none" : "";
+      const w1 = tagT1.getComputedTextLength(), w2 = narrow ? 0 : tagT2.getComputedTextLength();
+      const bw = Math.max(w1, w2) + 2.4 * pad;
+      const bh = narrow ? f1 + 2 * pad : f1 + f2 + 3 * pad;
+      const cx = Math.min(Math.max(q.x - 150, 260 + bw / 2), 780 - bw / 2), cy = 226;
+      tagBox.setAttribute("x", cx - bw / 2); tagBox.setAttribute("y", cy - bh / 2);
+      tagBox.setAttribute("width", bw); tagBox.setAttribute("height", bh);
+      tagT1.setAttribute("x", cx);
+      tagT1.setAttribute("y", narrow ? cy + f1 * .36 : cy - bh / 2 + pad + f1 * .8);
+      tagT2.setAttribute("x", cx); tagT2.setAttribute("y", cy + bh / 2 - pad);
+      lead.setAttribute("x1", cx); lead.setAttribute("y1", cy - bh / 2);
+      lead.setAttribute("x2", q.x); lead.setAttribute("y2", q.y + 14 * s);
+      lead.setAttribute("stroke-width", Math.max(1.5, k));
+    }
+
+    /* ---------- idle motion once the car is parked ---------- */
+    let fxRunning = false, fxVisible = false, fxT0 = 0, fxLoop = 0;
+    const sm = x => x * x * (3 - 2 * x);
+    const ease = u => (u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+    const softBeacon = u => {         /* a double pulse, eased in and out so it breathes */
+      const soft = (c, h) => { const d = u - c; return d < 0 || d > .36 ? 0 : (d < .08 ? sm(d / .08) : sm(1 - (d - .08) / .28)) * h; };
+      return Math.max(soft(0, 1), soft(.2, .6));
+    };
+
+    function fxReset() {
+      prog.setAttribute("opacity", "1"); zone.setAttribute("opacity", finished ? ".7" : "0");
+      head.setAttribute("opacity", "0"); burst.setAttribute("opacity", "0");
+      trail.forEach(t => t.setAttribute("opacity", "0"));
+    }
+    function fx(t) {
+      fxReset();
+      /* the amber pulse cycle is exactly half the ghost's, so the amber
+         swells as the ghost leaves the car, and once more mid-lap */
+      const v = softBeacon((t % 3.1) / 3.1);
+      prog.setAttribute("opacity", (.64 + .36 * v).toFixed(3));
+      zone.setAttribute("opacity", (.45 + .4 * v).toFixed(3));
+      /* ghost lap: a light runs the rest of the lap to the flag, the flag flashes, pause */
+      const cyc = 6.2, u = t % cyc, runT = 3.4, start = CAR * L, end = L;
+      if (u < runT) {
+        const h = start + ease(u / runT) * (end - start);
+        const bands = [[0, 55], [55, 140], [140, 250]], ops = [1, .5, .2];
+        trail.forEach((tr, i) => {
+          const s = Math.max(start, h - bands[i][1] * k), e = Math.max(start, h - bands[i][0] * k);
+          tr.setAttribute("stroke-dasharray", windowDash(s, e, L));
+          tr.setAttribute("opacity", ops[i]);
+        });
+        const q = base.getPointAtLength(Math.min(h, L - .01));
+        head.setAttribute("cx", q.x); head.setAttribute("cy", q.y); head.setAttribute("opacity", "1");
+      } else if (u < runT + .8) {
+        const w = (u - runT) / .8;
+        burst.setAttribute("r", (8 + 34 * w) * Math.max(1, .8 * k));
+        burst.setAttribute("opacity", (.85 * (1 - w)).toFixed(3));
+      }
+    }
+    function fxSync() {
+      /* runs only while the map is on screen; each start gets its own loop
+         id, so a stale loop sees a newer id and stops */
+      const want = !reduced && finished && fxVisible;
+      if (want && !fxRunning) {
+        fxRunning = true; fxT0 = performance.now();
+        zone.classList.remove("rm-late");   /* per-frame pulse must not be smeared by the fade-in */
+        const lid = ++fxLoop;
+        (function fxFrame(now) {
+          if (!fxRunning || lid !== fxLoop) return;
+          fx((now - fxT0) / 1000);
+          requestAnimationFrame(fxFrame);
+        })(fxT0);
+      }
+      if (!want && fxRunning) { fxRunning = false; fxReset(); }
+    }
+
+    let runId = 0;
+    function run() {
+      /* a newer run cancels any drive-in still in flight, so two can't fight */
+      const id = ++runId;
+      zone.classList.add("rm-late");
+      fxRunning = false; fxReset();
+      finished = false; p = 0; draw();
+      const t0 = performance.now(), dur = 2600;
+      (function frame(now) {
+        if (id !== runId) return;
+        const u = Math.min(1, (now - t0) / dur);
+        const e = u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+        p = CAR * e;
+        if (u >= 1) { p = CAR; finished = true; }
+        draw();
+        if (u < 1) requestAnimationFrame(frame); else fxSync();
+      })(t0);
+    }
+
+    layout();
+    if ("ResizeObserver" in window) new ResizeObserver(layout).observe(svg);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(es => { fxVisible = es.some(e => e.isIntersecting); fxSync(); }).observe(svg);
+    }
+    if (!reduced && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver(es => {
+        if (es.some(e => e.isIntersecting)) { io.disconnect(); run(); }
+      }, { threshold: .35 });
+      io.observe(svg);
+    } else { p = CAR; finished = true; draw(); }
   }
 })();
 </script>
