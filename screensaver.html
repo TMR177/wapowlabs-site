@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAPOW Grid — the 80s screensaver</title>
+<meta name="description" content="A free 80s-style WAPOW screensaver for Windows: a time-attack racing car on a neon grid, wrapped in live CFD-style airflow.">
+<meta property="og:title" content="WAPOW Grid — the 80s screensaver">
+<meta property="og:description" content="Free for Windows. An 80s-style WAPOW screensaver with a racing car in CFD-style airflow.">
+<meta property="og:image" content="https://wapowlabs.com/img/wapow-grid-1.jpg">
+<style>
+  /* Palette lifted from wapow_dash.py — the dash IS the brand */
+  :root {
+    --bg:     #0b0e13;
+    --panel:  #131926;
+    --line:   #1c2436;
+    --teal:   #37e0c0;
+    --dim:    #6b7688;
+    --text:   #eef2f8;
+    --amber:  #ffb648;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+  .mono { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+  a { color: var(--teal); }
+
+  header {
+    padding: 56px 0 36px; text-align: center;
+    background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(55,224,192,.08), transparent);
+  }
+  .wordmark { width: min(230px, 60vw); height: auto; display: block; margin: 0 auto; overflow: visible; }
+  h1 {
+    font-size: 13px; letter-spacing: .4em; text-indent: .4em;
+    text-transform: uppercase; color: var(--teal); font-weight: 600;
+    margin-top: 34px; text-shadow: 0 0 18px rgba(55,224,192,.4);
+  }
+  .headline { color: var(--text); font-size: clamp(26px, 4.6vw, 40px); font-weight: 700; margin-top: 10px; line-height: 1.2; text-wrap: balance; }
+  .sub { color: var(--dim); max-width: 640px; margin: 14px auto 0; font-size: 17px; text-wrap: pretty; }
+
+  /* ---------- hero shot + download ---------- */
+  .shot {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px; box-shadow: 0 12px 60px rgba(0,0,0,.5);
+  }
+  .shot img { display: block; width: 100%; height: auto; border-radius: 6px; }
+  .get { text-align: center; margin-top: 30px; }
+  .btn {
+    display: inline-block; padding: 14px 34px; border-radius: 6px; text-decoration: none;
+    font-weight: 600; font-size: 16px; letter-spacing: .02em;
+    background: var(--teal); color: var(--bg); box-shadow: 0 0 24px rgba(55,224,192,.35);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
+  .btn:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .meta { color: var(--dim); font-size: 13.5px; margin-top: 12px; letter-spacing: .04em; }
+  .hash { color: var(--dim); font-size: 11.5px; margin-top: 6px; overflow-wrap: anywhere; }
+
+  /* ---------- sections ---------- */
+  section { padding: 54px 0 0; }
+  h2 {
+    font-size: 13px; letter-spacing: .35em; text-transform: uppercase; color: var(--teal);
+    font-weight: 600; margin-bottom: 16px;
+  }
+  p { color: var(--dim); font-size: 15.5px; }
+  p + p { margin-top: 10px; }
+  strong { color: var(--text); font-weight: 600; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+  ul.ticks { list-style: none; display: grid; gap: 9px; }
+  ul.ticks li { color: var(--dim); font-size: 15.5px; padding-left: 20px; position: relative; }
+  ul.ticks li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px;
+                        border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px rgba(55,224,192,.6); }
+  ol.steps { list-style: none; counter-reset: s; display: grid; gap: 10px; }
+  ol.steps li { counter-increment: s; color: var(--dim); font-size: 15.5px; padding-left: 36px; position: relative; }
+  ol.steps li::before {
+    content: counter(s); position: absolute; left: 0; top: .1em; width: 24px; height: 24px; border-radius: 50%;
+    display: grid; place-items: center; font: 700 12px/1 Consolas, "Cascadia Mono", monospace;
+    border: 1.5px solid var(--teal); color: var(--teal);
+  }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .92em; color: var(--text);
+         background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+  .note {
+    margin-top: 22px; padding: 16px 20px; background: var(--panel); border: 1px solid var(--line);
+    border-left: 3px solid var(--amber); border-radius: 8px;
+  }
+  .note p { font-size: 14.5px; }
+  .faq { display: grid; gap: 16px; }
+  .faq dt { color: var(--text); font-weight: 600; font-size: 15.5px; }
+  .faq dd { color: var(--dim); font-size: 15px; margin-top: 2px; }
+  .credits {
+    margin-top: 6px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+  }
+  .credits p { font-size: 13.5px; }
+  .follow { text-align: center; padding: 64px 0 0; }
+  .follow p { font-size: 16px; }
+
+  footer { padding: 56px 0 64px; text-align: center; color: var(--dim); font-size: 14px; }
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .foot-links { display: flex; gap: 28px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" aria-label="WAPOW Labs home">
+  <svg class="wordmark" viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WAPOW">
+    <g fill="#ffffff">
+      <rect x="10" y="10" width="10" height="10"/><rect x="70" y="10" width="10" height="10"/>
+      <rect x="10" y="20" width="10" height="10"/><rect x="70" y="20" width="10" height="10"/>
+      <rect x="10" y="30" width="10" height="10"/><rect x="70" y="30" width="10" height="10"/>
+      <rect x="10" y="40" width="10" height="10"/><rect x="40" y="40" width="10" height="10"/><rect x="70" y="40" width="10" height="10"/>
+      <rect x="10" y="50" width="10" height="10"/><rect x="40" y="50" width="10" height="10"/><rect x="70" y="50" width="10" height="10"/>
+      <rect x="10" y="60" width="10" height="10"/><rect x="30" y="60" width="10" height="10"/><rect x="50" y="60" width="10" height="10"/><rect x="70" y="60" width="10" height="10"/>
+      <rect x="20" y="70" width="10" height="10"/><rect x="60" y="70" width="10" height="10"/>
+      <rect x="120" y="10" width="20" height="10"/><rect x="110" y="20" width="40" height="10"/>
+      <rect x="100" y="30" width="10" height="10"/><rect x="150" y="30" width="10" height="10"/>
+      <rect x="100" y="40" width="10" height="10"/><rect x="150" y="40" width="10" height="10"/>
+      <rect x="100" y="50" width="60" height="10"/>
+      <rect x="100" y="60" width="10" height="10"/><rect x="150" y="60" width="10" height="10"/>
+      <rect x="100" y="70" width="10" height="10"/><rect x="150" y="70" width="10" height="10"/>
+      <rect x="180" y="10" width="50" height="10"/>
+      <rect x="180" y="20" width="10" height="10"/><rect x="230" y="20" width="10" height="10"/>
+      <rect x="180" y="30" width="10" height="10"/><rect x="230" y="30" width="10" height="10"/>
+      <rect x="180" y="40" width="50" height="10"/>
+      <rect x="180" y="50" width="10" height="10"/><rect x="180" y="60" width="10" height="10"/><rect x="180" y="70" width="10" height="10"/>
+      <rect x="270" y="10" width="40" height="10"/>
+      <rect x="260" y="20" width="10" height="10"/><rect x="310" y="20" width="10" height="10"/>
+      <rect x="260" y="30" width="10" height="10"/><rect x="310" y="30" width="10" height="10"/>
+      <rect x="260" y="40" width="10" height="10"/><rect x="310" y="40" width="10" height="10"/>
+      <rect x="260" y="50" width="10" height="10"/><rect x="310" y="50" width="10" height="10"/>
+      <rect x="260" y="60" width="10" height="10"/><rect x="310" y="60" width="10" height="10"/>
+      <rect x="270" y="70" width="40" height="10"/>
+      <rect x="340" y="10" width="10" height="10"/><rect x="400" y="10" width="10" height="10"/>
+      <rect x="340" y="20" width="10" height="10"/><rect x="400" y="20" width="10" height="10"/>
+      <rect x="340" y="30" width="10" height="10"/><rect x="400" y="30" width="10" height="10"/>
+      <rect x="340" y="40" width="10" height="10"/><rect x="370" y="40" width="10" height="10"/><rect x="400" y="40" width="10" height="10"/>
+      <rect x="340" y="50" width="10" height="10"/><rect x="370" y="50" width="10" height="10"/><rect x="400" y="50" width="10" height="10"/>
+      <rect x="340" y="60" width="10" height="10"/><rect x="360" y="60" width="10" height="10"/><rect x="380" y="60" width="10" height="10"/><rect x="400" y="60" width="10" height="10"/>
+      <rect x="350" y="70" width="10" height="10"/><rect x="390" y="70" width="10" height="10"/>
+    </g>
+    <!-- ™ (US serial 50131306, filed 9/27/2026 — ™ only; ® is illegal until
+         it registers). Same pixel language at 40% scale: 4-unit pixels,
+         top-aligned to the caps, hanging past the 420 edge so WAPOW stays
+         centered — hence overflow:visible on .wordmark. -->
+    <g fill="#ffffff">
+      <rect x="416" y="10" width="12" height="4"/><rect x="420" y="14" width="4" height="16"/>
+      <rect x="432" y="10" width="4" height="20"/><rect x="448" y="10" width="4" height="20"/>
+      <rect x="436" y="14" width="4" height="4"/><rect x="444" y="14" width="4" height="4"/>
+      <rect x="440" y="18" width="4" height="4"/>
+    </g>
+  </svg>
+  </a>
+  <h1>WAPOW Grid</h1>
+  <p class="headline">The 80s screensaver</p>
+  <p class="sub">An 80s-style WAPOW screensaver: a time-attack racing car on a neon grid,
+     wrapped in live CFD-style airflow. Free for Windows.</p>
+</header>
+
+<div class="wrap">
+
+  <div class="shot">
+    <img src="img/wapow-grid-1.jpg" width="1600" height="900"
+         alt="The WAPOW Grid screensaver: a chrome WAPOW logo over a striped synthwave sun, wireframe mountains, and a neon-outlined Evo 8 trailing airflow streaks across a magenta grid.">
+  </div>
+
+  <div class="get">
+    <a class="btn" href="/downloads/WAPOW-Grid-Screensaver-1.0.zip">Download for Windows</a>
+    <p class="meta mono">Version 1.0 · 3.4 MB zip · Windows 10/11 (64-bit) · Free</p>
+    <p class="hash mono">SHA-256 12F9964CF2E94C3FDCF0811A1D6173E2CBA3363198CB0DFB61D4C62398D37249</p>
+  </div>
+
+  <section>
+    <div class="split">
+      <div>
+        <h2>What's in it</h2>
+        <ul class="ticks">
+          <li>Chrome WAPOW logo with comic-book WAPOW bursts and glitch effects</li>
+          <li>Synthwave sun, wireframe mountains and falling code rain</li>
+          <li>GPU-rendered Evo 8 time-attack car with neon edges and spinning wheels</li>
+          <li>Real-time airflow particles that react to the wing, diffuser, splitter and wheels</li>
+          <li>The car overtakes the camera every so often for a close look</li>
+          <li>Works across multiple monitors</li>
+          <li>Auto graphics quality, so it runs smoothly on older PCs too</li>
+        </ul>
+      </div>
+      <div class="shot">
+        <img src="img/wapow-grid-2.jpg" width="1600" height="900" loading="lazy"
+             alt="Close-up of the neon Evo 8 from behind, its big rear wing and diffuser throwing streaks of airflow.">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="split">
+      <div>
+        <h2>How to install</h2>
+        <ol class="steps">
+          <li>Download and unzip.</li>
+          <li>Move <code>WapowGrid.scr</code> to a folder you'll keep, such as Documents.</li>
+          <li>Right-click <code>WapowGrid.scr</code> and choose <strong>Install</strong>.</li>
+          <li>Pick a wait time in Screen Saver Settings and click <strong>OK</strong>.</li>
+        </ol>
+        <div class="note">
+          <p><strong>“Windows protected your PC”?</strong> Windows shows this for screensavers that
+             aren't sold through a store. Click <strong>More info</strong>, then <strong>Run anyway</strong>.</p>
+        </div>
+      </div>
+      <div>
+        <h2>Requirements</h2>
+        <ul class="ticks">
+          <li>Windows 10 or 11 (64-bit)</li>
+          <li>Microsoft Edge WebView2 Runtime (built into Windows 11; already on almost every Windows 10 PC)</li>
+          <li>Any graphics card from the last 10 years</li>
+        </ul>
+        <h2 style="margin-top: 30px;">Settings</h2>
+        <p>In Screen Saver Settings, click <strong>Settings…</strong> to choose graphics quality (Auto,
+           High, Medium, Low), the car's neon colour, and how often it overtakes.</p>
+        <h2 style="margin-top: 30px;">Uninstall</h2>
+        <p>Choose “(None)” in Screen Saver Settings, then delete <code>WapowGrid.scr</code>.
+           For a full clean-up, also delete the folder <code>%LOCALAPPDATA%\WapowGrid</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>FAQ</h2>
+    <dl class="faq">
+      <div>
+        <dt>The screen goes black instead of showing the animation.</dt>
+        <dd>Install the free <a href="https://developer.microsoft.com/microsoft-edge/webview2/">Microsoft Edge WebView2 Runtime</a>.</dd>
+      </div>
+      <div>
+        <dt>It stutters.</dt>
+        <dd>Open Settings… and choose Low. Auto mode also steps down on its own after a few seconds.</dd>
+      </div>
+      <div>
+        <dt>Does it go online?</dt>
+        <dd>Only to load three fonts from Google Fonts. It doesn't collect or send anything about you.
+            It works fine offline; the WAPOW lettering just uses a plain bold font instead.</dd>
+      </div>
+      <div>
+        <dt>Mac or Linux?</dt>
+        <dd>Windows only for now.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Credits</h2>
+    <div class="credits">
+      <p>Car model: <a href="https://sketchfab.com/3d-models/mitsubishi-lancer-evo-8-time-attack-xtreme-aeba48d6449041b48a60434edffef970">“Mitsubishi Lancer Evo 8 Time attack Xtreme”</a>
+         by DRIVER-FIRE, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+         Modified for this screensaver. Original body kit by Hamlink, base interior by Speedude Performance,
+         original wheels by S.D Jackson.</p>
+      <p>Mitsubishi and Lancer Evolution are trademarks of Mitsubishi Motors Corporation. WAPOW Grid is a
+         fan creation and is not affiliated with or endorsed by Mitsubishi Motors.</p>
+    </div>
+  </section>
+
+  <div class="follow">
+    <p>WAPOW is a real dash, being built in public. <a href="/#roadmap">See where the build is</a>
+       or <a href="/#build-log">get the Build Log</a>.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="/parts.html">Parts list</a>
+    <a href="https://www.youtube.com/@wapowlabs">YouTube</a>
+    <a href="https://ko-fi.com/wapowlabs">Tip jar (Ko-fi)</a>
+    <a href="mailto:hello@wapowlabs.com">hello@wapowlabs.com</a>
+  </div>
+  © 2026 WAPOW Labs · WAPOW — Windowed Adaptive Performance Optimization Widget
+</footer>
+
+</body>
+</html>

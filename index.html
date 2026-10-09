@@ -192,6 +192,26 @@
     .rm-pulse { animation: none; opacity: .35; }
     .rm-late { transition: none; }
   }
+
+  /* ---------- screensaver card (quiet, above the footer) ---------- */
+  .extra { padding: 8px 0 0; }
+  .extra-card {
+    display: flex; align-items: center; gap: 22px; max-width: 760px; margin: 0 auto;
+    padding: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    text-decoration: none; color: inherit; transition: border-color .2s ease, transform .2s ease;
+  }
+  .extra-card:hover { border-color: rgba(55,224,192,.45); transform: translateY(-2px); }
+  .extra-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .extra-card img { width: 220px; height: auto; flex: 0 0 auto; border-radius: 6px; display: block; }
+  .extra-eyebrow { font-size: 11.5px; letter-spacing: .25em; text-transform: uppercase; color: var(--teal); }
+  .extra-title { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .extra-text { font-size: 14.5px; color: var(--dim); margin-top: 4px; }
+  .extra-go { font-size: 14.5px; color: var(--teal); margin-top: 8px; font-weight: 600; }
+  @media (max-width: 560px) {
+    .extra-card { flex-direction: column; align-items: stretch; gap: 12px; }
+    .extra-card img { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .extra-card { transition: none; } .extra-card:hover { transform: none; } }
 </style>
 </head>
 <body>
@@ -437,6 +457,20 @@
   </div>
 </section>
 
+<section class="extra" aria-label="Free download">
+  <div class="wrap">
+    <a class="extra-card" href="/screensaver.html">
+      <img src="img/wapow-grid-thumb.jpg" width="480" height="270" loading="lazy" alt="">
+      <div>
+        <div class="extra-eyebrow mono">Free download</div>
+        <div class="extra-title">WAPOW Grid — the 80s screensaver</div>
+        <p class="extra-text">An 80s-style WAPOW screensaver with a racing car in CFD-style airflow. For Windows.</p>
+        <p class="extra-go">Get the screensaver →</p>
+      </div>
+    </a>
+  </div>
+</section>
+
 <footer>
   <div class="foot-links">
     <a href="https://www.youtube.com/@wapowlabs">YouTube</a>
@@ -445,6 +479,7 @@
   </div>
   <div class="foot-links">
     <a href="/parts.html">Parts list</a>
+    <a href="/screensaver.html">Screensaver</a>
     <a href="https://ko-fi.com/wapowlabs">Tip jar (Ko-fi)</a>
     <a href="https://github.com/sponsors/TMR177">GitHub Sponsors</a>
     <a href="#build-log">Build Log newsletter</a>
