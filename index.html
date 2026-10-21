@@ -100,6 +100,34 @@
   .m-spirit  { color: var(--amber); }
   .m-racing  { color: var(--red); }
 
+  /* ---------- driving levels: one meter, three levels ---------- */
+  .levels { margin-top: 56px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+            background: var(--panel); padding: 22px 24px 18px; }
+  .levels-in { max-width: 760px; margin: 0 auto; }
+  .lv-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; height: 10px; }
+  .lv-seg { border-radius: 3px; }
+  .lv-seg.s1 { background: var(--parked); opacity: .55; }
+  .lv-seg.s2 { background: var(--blue); opacity: .8; }
+  .lv-seg.s3 { background: var(--amber); }
+  .lv-cap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 10px; text-align: center; }
+  .lv-cap span { display: block; font-size: 13px; letter-spacing: .25em; text-indent: .25em; }
+  .lv-cap b { display: block; font-size: 12px; color: var(--dim); font-weight: 400; margin-top: 2px; }
+  .m-aggr { color: var(--amber); }
+  .lv-note { text-align: center; color: var(--dim); font-size: 13.5px; margin-top: 12px; }
+  @media (max-width: 560px) { .lv-cap span { letter-spacing: .12em; text-indent: .12em; font-size: 12px; } }
+
+  /* ---------- demo: a recording of the real 12.3" dash ---------- */
+  .demo-shell { position: relative; }
+  #demo-video { display: block; width: 100%; height: auto; border-radius: 6px; background: #000;
+                aspect-ratio: 1920 / 720; }
+  .demo-play {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    padding: 13px 30px; border-radius: 6px; border: 0; cursor: pointer;
+    background: var(--teal); color: var(--bg); font: 600 15px/1 "Segoe UI", system-ui, sans-serif;
+    letter-spacing: .02em; box-shadow: 0 0 24px rgba(55,224,192,.35);
+  }
+  .demo-play:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+
   /* ---------- sections ---------- */
   section { padding: 76px 0; }
   h2 {
@@ -267,9 +295,9 @@
   <div class="labs mono hero-fade d1">Labs</div>
 
   <h1 class="tagline hero-fade d1">The dash that knows how you're driving.</h1>
-  <p class="sub hero-fade d2">Traditional dashes treat every gauge the same. Your attention doesn't.
-     WAPOW senses driving context — G-forces, RPM, speed — and <em>reprioritizes the
-     screen in real time</em>. Calm when you cruise. Locked in when you send it.</p>
+  <p class="sub hero-fade d2">Other dashes show the page you set up. WAPOW reads how you're
+     driving — G-forces, RPM, speed — and <em>reprioritizes the screen for you, in real
+     time</em>. Calm when you cruise. Locked in when you send it.</p>
 
   <div class="cta-row hero-fade d3">
     <a class="btn btn-primary" href="#demo-section">See it think</a>
@@ -277,29 +305,41 @@
   </div>
 
   <div class="stats hero-fade d3">
-    <div class="stat"><b>4</b><span>driving modes</span></div>
+    <div class="stat"><b>3</b><span>driving levels</span></div>
     <div class="stat"><b>50 fps</b><span>on a Raspberry Pi</span></div>
     <div class="stat"><b>GPL v3</b><span>open source</span></div>
-    <div class="stat"><b>0</b><span>subscriptions, ever</span></div>
+    <div class="stat"><b>0</b><span>subscriptions required</span></div>
   </div>
 </header>
 
-<div class="modes mono">
-  <div class="mode m-parked">PARKED<b>everything, calmly</b></div>
-  <div class="mode m-cruise">CRUISING<b>the essentials</b></div>
-  <div class="mode m-spirit">SPIRITED<b>performance up front</b></div>
-  <div class="mode m-racing">RACING<b>only what matters</b></div>
+<div class="levels">
+  <div class="levels-in">
+    <div class="lv-bar" role="img" aria-label="A meter that rises with how you're driving, in three levels: parked, cruising, aggressive">
+      <span class="lv-seg s1"></span><span class="lv-seg s2"></span><span class="lv-seg s3"></span>
+    </div>
+    <div class="lv-cap">
+      <div class="m-parked"><span class="mono">PARKED</span><b>everything, calmly</b></div>
+      <div class="m-cruise"><span class="mono">CRUISING</span><b>the essentials</b></div>
+      <div class="m-aggr"><span class="mono">AGGRESSIVE</span><b>only what matters</b></div>
+    </div>
+    <p class="lv-note">On the dash it's just the meter — no mode names to read. It rises with
+       how you're driving, and the screen steps up with it.</p>
+  </div>
 </div>
 
 <section id="demo-section">
   <div class="wrap">
     <h2>Watch it think</h2>
-    <p class="h2sub">This is a live miniature of the real dash — <strong>same layouts, same
-       palette, same rules</strong> — running one hard lap of <strong>Laguna Seca</strong> on loop.
-       Watch the temps creep, the alerts stack up through the Corkscrew, and the
-       triage rules earn their keep.</p>
+    <p class="h2sub">The 12.3" dash, recorded at its native 1920×720 — <strong>the layout it
+       ships with</strong>, running the dash's real engines on a simulated drive. Watch the
+       screen step up as the driving builds, and alarms pulse right where they sit.</p>
     <div class="demo-shell">
-      <canvas id="demo" width="1024" height="600" aria-label="Animated demo: the WAPOW dash running a lap of Laguna Seca"></canvas>
+      <video id="demo-video" width="1920" height="720" muted loop playsinline preload="metadata"
+             poster="video/wapow-12in3-demo-poster.jpg"
+             aria-label="Recording of the WAPOW 12.3-inch dash on a simulated drive: cruising, then driving hard, then alarms pulsing in place.">
+        <source src="video/wapow-12in3-demo.mp4" type="video/mp4">
+      </video>
+      <button class="demo-play" id="demo-play" type="button" hidden>▶ Play the drive</button>
     </div>
     <p class="demo-caption" id="demo-cap"></p>
   </div>
@@ -313,15 +353,15 @@
     <div class="cards">
       <div class="card">
         <h3>Motion means meaning.</h3>
-        <p>If something on this screen moves, it's because you <em>need to look at it</em>.
-           The layout never fidgets, never decorates. Movement is information — so
-           when the dash rearranges, your gut already knows why.</p>
+        <p>Nothing on this screen moves for show. A pulse means a reading went bad. A
+           step up means you're <em>driving harder</em>. Everything else holds still,
+           right where you put it.</p>
       </div>
       <div class="card">
         <h3>Escalate fast. De-escalate slow.</h3>
-        <p>Throw it into a corner and the dash is in SPIRITED <em>before you exit</em>.
-           But it only calms down after six seconds of sustained chill, one level at a
-           time — no flickering back and forth mid-session.</p>
+        <p>Throw it into a corner and the dash steps up <em>before you exit</em>.
+           It only settles back after a sustained stretch of calm, one level at a time —
+           and you set how long. No flickering back and forth mid-session.</p>
       </div>
       <div class="card">
         <h3>Deviation, not raw values.</h3>
@@ -330,22 +370,22 @@
            normal-for-right-now. Steady when healthy. Loud when it isn't.</p>
       </div>
       <div class="card">
-        <h3>Sentinel gauges stand watch.</h3>
-        <p>Oil pressure, fuel pressure, AFR — the three that kill engines — live in a
-           small fixed home row, always on duty. The moment one goes abnormal it
-           <em>promotes itself to the main view</em>. You cannot miss it.</p>
-      </div>
-      <div class="card">
-        <h3>Alerts triage themselves.</h3>
-        <p>Two problems at once? Three? Each active alert claims a slot — one big, two
-           medium, three small — ranked by what kills the engine first. Everything
-           non-critical dims and gets out of the way.</p>
+        <h3>Alarms pulse where they live.</h3>
+        <p>When a reading goes bad, that gauge lights up in its alarm look and
+           <em>pulses twice, quick</em>, right where it sits on your screen. Your eye
+           goes straight to it.</p>
       </div>
       <div class="card">
         <h3>Knock gets caught in the act.</h3>
         <p>Knock flashes instantly, tagged with the RPM and load where it happened, and
            logs every event with an unread badge. One tap at the next stoplight tells
            you exactly what your engine was doing when it pinged.</p>
+      </div>
+      <div class="card">
+        <h3>Don't like our screen? Change it.</h3>
+        <p>The layout we ship is <em>a starting point</em>. Rearrange the gauges and
+           alarms, vibe-code your own with an AI, or load one someone else built. The
+           screen is software. The capability is in the hardware.</p>
       </div>
     </div>
   </div>
@@ -358,8 +398,8 @@
        selling assembled, tested units so you don't have to solder anything.</p>
     <p class="lede">Built on years of professional motorsports — pit walls, wrenches,
        and drivers who couldn't spare a glance — documented on camera from the
-       first breadboard onward. Test car: a 2000 Impreza 2.5RS with an STI heart.
-       Every failure ships as an episode.</p>
+       first breadboard onward. Project car: a 2000 Impreza 2.5RS with an STI heart.
+       Test mule: a 2005 STI. Every failure ships as an episode.</p>
   </div>
 </section>
 
@@ -1227,6 +1267,55 @@
       io.observe(svg);
     } else { p = CAR; finished = true; draw(); }
   }
+})();
+</script>
+
+<script>
+/* ============ demo: the 12.3" recording, with captions timed to it ============
+   The video is a recording of the 12.3" lab running Ty's saved default (10/21)
+   on the dash's simulated drive. Captions follow the video's own clock. With
+   reduced motion it never plays on its own: a play button waits instead. */
+(function () {
+  const v = document.getElementById("demo-video");
+  const cap = document.getElementById("demo-cap");
+  const btn = document.getElementById("demo-play");
+  if (!v) return;
+  /* [start s, caption, small print] - times are video seconds */
+  const CAPS = [
+    [0,    "Cruising. Speed front and center, every gauge where you put it.", "simulated drive · the 12.3-inch layout it ships with"],
+    [16.2, "Driving hard. The meter climbs and the screen steps up: gear in the middle, G-forces on the left.", "the layout steps up at a mark on the meter"],
+    [34.9, "Boost spikes past its limit. The boost gauge lights up and pulses twice, right where it sits.", "OVERBOOST"],
+    [37.5, "Oil pressure sags under load. Same thing: that gauge lights up and pulses, in place.", ""],
+    [40.4, "Oil temp crosses its line too. Each alarm lit right where its gauge lives.", ""],
+    [53.0, "Oil pressure recovers and clears. Oil temp takes its time.", ""]
+  ];
+  let shown = -1;
+  function caption() {
+    const t = v.currentTime;
+    let i = 0;
+    while (i + 1 < CAPS.length && t >= CAPS[i + 1][0]) i++;
+    if (i === shown) return;
+    shown = i;
+    cap.innerHTML = CAPS[i][1] + (CAPS[i][2] ? '<span class="mono">' + CAPS[i][2] + "</span>" : "");
+  }
+  v.addEventListener("timeupdate", caption);
+  v.addEventListener("seeked", caption);
+  caption();
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) {
+    btn.hidden = false;
+    btn.addEventListener("click", () => { btn.hidden = true; v.controls = true; v.play(); });
+    return;
+  }
+  /* play only while it's on screen */
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) v.play().catch(() => { btn.hidden = false; }); else v.pause(); });
+    }, { threshold: .25 }).observe(v);
+  } else {
+    v.play().catch(() => { btn.hidden = false; });
+  }
+  btn.addEventListener("click", () => { btn.hidden = true; v.play(); });
 })();
 </script>
 
